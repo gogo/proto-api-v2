@@ -1,0 +1,11 @@
+github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=
+github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
+github.com/golang/protobuf/v2 v2.0.0-20181119233400-44e389ca6c13 h1:YtO5yQ8ZFMIUI5ASLPcps3HrLeRImM/OX2sIwQJlkVY=
+github.com/golang/protobuf/v2 v2.0.0-20181119233400-44e389ca6c13/go.mod h1:pUFc/zvPj/qlI5nj8gEgsCPCTpICLT32W2c/kQ1v5HU=
+github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
+golang.org/x/net v0.0.0-20180821023952-922f4815f713/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
+golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+golang.org/x/tools v0.0.0-20180904205237-0aa4b8830f48 h1:PIz+xUHW4G/jqfFWeKhQ96ZV/t2HDsXfWj923rV0bZY=
+golang.org/x/tools v0.0.0-20180904205237-0aa4b8830f48/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+golang.org/x/tools v0.0.0-20181116193547-e77c06808af6 h1:eiQyQ1ZGSmM3I3XUf/clCROlBlOlmAUmTJ9l2GjX2GE=
+golang.org/x/tools v0.0.0-20181116193547-e77c06808af6/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
