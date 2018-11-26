@@ -19,6 +19,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/gogo/protobuf/gogoproto"
 	descpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/gogo/protobuf/internal/encoding/tag"
 	"github.com/golang/protobuf/v2/protogen"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
 )
@@ -626,12 +627,11 @@ func fieldGoType(g *protogen.GeneratedFile, field *protogen.Field) (goType strin
 }
 
 func fieldProtobufTag(field *protogen.Field) string {
-	// var enumName string
-	// if field.Desc.Kind() == protoreflect.EnumKind {
-	// 	enumName = enumRegistryName(field.EnumType)
-	// }
-	// return tag.Marshal(field.Desc, enumName)
-	return field.GoName
+	var enumName string
+	if field.Desc.Kind() == protoreflect.EnumKind {
+		enumName = enumRegistryName(field.EnumType)
+	}
+	return tag.Marshal(field.Desc, enumName)
 }
 
 func fieldDefaultValue(g *protogen.GeneratedFile, message *protogen.Message, field *protogen.Field) string {
