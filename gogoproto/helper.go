@@ -29,13 +29,39 @@
 package gogoproto
 
 import (
+	"reflect"
 	google_protobuf "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	proto "github.com/golang/protobuf/proto"
 )
 
-func GetCastType(options *google_protobuf.FieldOptions) string {
-	if options != nil {
-		v, err := proto.GetExtension(options, E_Casttype)
+func IsMarshaler(file *google_protobuf.FileDescriptorProto, messageOptions proto.Message) bool {
+	return GetBoolExtension(messageOptions, E_Marshaler, GetBoolExtension(file.Options, E_MarshalerAll, false))
+}
+
+func IsUnmarshaler(file *google_protobuf.FileDescriptorProto, messageOptions proto.Message) bool {
+	return GetBoolExtension(messageOptions, E_Marshaler, GetBoolExtension(file.Options, E_UnmarshalerAll, false))
+}
+
+func GetBoolExtension(pb proto.Message, extension *proto.ExtensionDesc, ifnotset bool) bool {
+	if reflect.ValueOf(pb).IsNil() {
+		return ifnotset
+	}
+	value, err := proto.GetExtension(pb, extension)
+	if err != nil {
+		return ifnotset
+	}
+	if value == nil {
+		return ifnotset
+	}
+	if value.(*bool) == nil {
+		return ifnotset
+	}
+	return *(value.(*bool))
+}
+
+func GetCastType(fileldOptions *google_protobuf.FieldOptions) string {
+	if fileldOptions != nil {
+		v, err := proto.GetExtension(fileldOptions, E_Casttype)
 		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
 		}

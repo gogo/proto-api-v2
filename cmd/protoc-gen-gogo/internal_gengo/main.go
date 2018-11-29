@@ -382,11 +382,10 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 				fmt.Sprintf("protobuf_val:%q", fieldProtobufTag(val)),
 			)
 		}
-		options := field.Desc.Options().(*descpb.FieldOptions)
 		g.Annotate(message.GoIdent.GoName+"."+field.GoName, field.Location)
-		if options != nil {
-			v := gogoproto.GetCastType(options)
-			g.P("//AFOO ", v)
+
+		if gogoproto.IsMarshaler(f.Proto, message.Desc.Options().(*descpb.MessageOptions)) {
+			g.P("//AFOO yay IsMarshaler")
 		}
 
 		g.P(field.GoName, " ", goType, " `", strings.Join(tags, " "), "`",
