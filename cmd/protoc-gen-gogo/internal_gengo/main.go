@@ -385,7 +385,7 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 		g.Annotate(message.GoIdent.GoName+"."+field.GoName, field.Location)
 
 		if gogoproto.IsMarshaler(f.Proto, message.Desc.Options().(*descpb.MessageOptions)) {
-			g.P("//AFOO yay IsMarshaler")
+			genMarshalTo(gen, g, f, message)
 		}
 
 		g.P(field.GoName, " ", goType, " `", strings.Join(tags, " "), "`",
@@ -841,3 +841,7 @@ var wellKnownTypes = map[protoreflect.FullName]bool{
 	"google.protobuf.Value":       true,
 }
 
+
+func genMarshalTo(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, message *protogen.Message) {
+	g.P(`MarshalTo([]byte) (int, error)`)
+}

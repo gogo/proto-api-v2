@@ -32,7 +32,7 @@ package data;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
-//option (gogoproto.marshaler_all) = true;
+option (gogoproto.marshaler_all) = true;
 //option (gogoproto.unmarshaler_all) = true;
 
 message MyMessage {
