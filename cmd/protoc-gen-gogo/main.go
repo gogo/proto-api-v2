@@ -11,7 +11,6 @@ import (
 	"flag"
 
 	gengo "github.com/gogo/protobuf/cmd/protoc-gen-gogo/internal_gengo"
-	//gengo "github.com/golang/protobuf/v2/cmd/protoc-gen-go/internal_gengo"
 	"github.com/golang/protobuf/v2/protogen"
 )
 

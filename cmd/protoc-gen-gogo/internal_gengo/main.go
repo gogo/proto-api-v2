@@ -11,37 +11,68 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/gogo/protobuf/gogoproto"
-	descpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/gogo/protobuf/internal/encoding/tag"
 	"github.com/golang/protobuf/v2/protogen"
 	"github.com/golang/protobuf/v2/reflect/protoreflect"
+
+	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 )
 
 // generatedCodeVersion indicates a version of the generated code.
 // It is incremented whenever an incompatibility between the generated code and
 // proto package is introduced; the generated code references
 // a constant, proto.ProtoPackageIsVersionN (where N is generatedCodeVersion).
-const generatedCodeVersion = 2
+const generatedCodeVersion = 3
 
 const (
-	fmtPackage   = protogen.GoImportPath("fmt")
-	mathPackage  = protogen.GoImportPath("math")
-	protoPackage = protogen.GoImportPath("github.com/golang/protobuf/proto")
+	fmtPackage      = protogen.GoImportPath("fmt")
+	mathPackage     = protogen.GoImportPath("math")
+	protoPackage    = protogen.GoImportPath("github.com/golang/protobuf/proto")
+	protoapiPackage = protogen.GoImportPath("github.com/golang/protobuf/protoapi")
 )
 
 type fileInfo struct {
 	*protogen.File
 	descriptorVar string // var containing the gzipped FileDescriptorProto
-	allEnums      []*protogen.Enum
-	allMessages   []*protogen.Message
-	allExtensions []*protogen.Extension
+
+	allEnums         []*protogen.Enum
+	allEnumsByPtr    map[*protogen.Enum]int // value is index into allEnums
+	allMessages      []*protogen.Message
+	allMessagesByPtr map[*protogen.Message]int // value is index into allMessages
+	allExtensions    []*protogen.Extension
+}
+
+// protoPackage returns the package to import, which is either the protoPackage
+// or the protoapiPackage constant.
+//
+// This special casing exists because we are unable to move InternalMessageInfo
+// to protoapi since the implementation behind that logic is heavy and
+// too intricately connected to other parts of the proto package.
+// The descriptor proto is special in that it avoids using InternalMessageInfo
+// so that it is able to depend solely on protoapi and break its dependency
+// on the proto package. It is still semantically correct for descriptor to
+// avoid using InternalMessageInfo, but it does incur some performance penalty.
+// This is acceptable for descriptor, which is a single proto file and is not
+// known to be in the hot path for any code.
+//
+// TODO: Remove this special-casing when the table-driven implementation has
+// been ported over to v2.
+func (f *fileInfo) protoPackage() protogen.GoImportPath {
+	if isDescriptor(f.File) {
+		return protoapiPackage
+	}
+	return protoPackage
 }
 
 // GenerateFile generates the contents of a .pb.go file.
@@ -50,18 +81,30 @@ func GenerateFile(gen *protogen.Plugin, file *protogen.File, g *protogen.Generat
 		File: file,
 	}
 
-
-	// The different order for enums and extensions is to match the output
-	// of the previous implementation.
-	//
-	// TODO: Eventually make this consistent.
-	f.allEnums = append(f.allEnums, f.File.Enums...)
-	walkMessages(f.Messages, func(message *protogen.Message) {
-		f.allMessages = append(f.allMessages, message)
-		f.allEnums = append(f.allEnums, message.Enums...)
-		f.allExtensions = append(f.allExtensions, message.Extensions...)
+	// Collect all enums, messages, and extensions in a breadth-first order.
+	f.allEnums = append(f.allEnums, f.Enums...)
+	f.allMessages = append(f.allMessages, f.Messages...)
+	f.allExtensions = append(f.allExtensions, f.Extensions...)
+	walkMessages(f.Messages, func(m *protogen.Message) {
+		f.allEnums = append(f.allEnums, m.Enums...)
+		f.allMessages = append(f.allMessages, m.Messages...)
+		f.allExtensions = append(f.allExtensions, m.Extensions...)
 	})
-	f.allExtensions = append(f.allExtensions, f.File.Extensions...)
+
+	// Derive a reverse mapping of enum and message pointers to their index
+	// in allEnums and allMessages.
+	if len(f.allEnums) > 0 {
+		f.allEnumsByPtr = make(map[*protogen.Enum]int)
+		for i, e := range f.allEnums {
+			f.allEnumsByPtr[e] = i
+		}
+	}
+	if len(f.allMessages) > 0 {
+		f.allMessagesByPtr = make(map[*protogen.Message]int)
+		for i, m := range f.allMessages {
+			f.allMessagesByPtr[m] = i
+		}
+	}
 
 	// Determine the name of the var holding the file descriptor:
 	//
@@ -85,27 +128,15 @@ func GenerateFile(gen *protogen.Plugin, file *protogen.File, g *protogen.Generat
 	g.P("package ", f.GoPackageName)
 	g.P()
 
-	// These references are not necessary, since we automatically add
-	// all necessary imports before formatting the generated file.
-	//
-	// This section exists to generate output more consistent with
-	// the previous version of protoc-gen-go, to make it easier to
-	// detect unintended variations.
-	//
-	// TODO: Eventually remove this.
-	g.P("// Reference imports to suppress errors if they are not otherwise used.")
-	g.P("var _ = ", protoPackage.Ident("Marshal"))
-	g.P("var _ = ", fmtPackage.Ident("Errorf"))
-	g.P("var _ = ", mathPackage.Ident("Inf"))
-	g.P()
-
-	g.P("// This is a compile-time assertion to ensure that this generated file")
-	g.P("// is compatible with the proto package it is being compiled against.")
-	g.P("// A compilation error at this line likely means your copy of the")
-	g.P("// proto package needs to be updated.")
-	g.P("const _ = ", protoPackage.Ident(fmt.Sprintf("ProtoPackageIsVersion%d", generatedCodeVersion)),
-		"// please upgrade the proto package")
-	g.P()
+	if !isDescriptor(file) {
+		g.P("// This is a compile-time assertion to ensure that this generated file")
+		g.P("// is compatible with the proto package it is being compiled against.")
+		g.P("// A compilation error at this line likely means your copy of the")
+		g.P("// proto package needs to be updated.")
+		g.P("const _ = ", protoPackage.Ident(fmt.Sprintf("ProtoPackageIsVersion%d", generatedCodeVersion)),
+			"// please upgrade the proto package")
+		g.P()
+	}
 
 	for i, imps := 0, f.Desc.Imports(); i < imps.Len(); i++ {
 		genImport(gen, g, f, imps.Get(i))
@@ -116,12 +147,14 @@ func GenerateFile(gen *protogen.Plugin, file *protogen.File, g *protogen.Generat
 	for _, message := range f.allMessages {
 		genMessage(gen, g, f, message)
 	}
-	for _, extension := range f.Extensions {
+	for _, extension := range f.allExtensions {
 		genExtension(gen, g, f, extension)
 	}
 
 	genInitFunction(gen, g, f)
 	genFileDescriptor(gen, g, f)
+	genReflectInitFunction(gen, g, f)
+	genReflectFileDescriptor(gen, g, f)
 }
 
 // walkMessages calls f on each message and all of its descendants.
@@ -150,59 +183,65 @@ func genImport(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, imp
 	if !imp.IsPublic {
 		return
 	}
-	// TODO: An alternate approach to generating public imports might be
-	// to generate the imported file contents, parse it, and extract all
-	// exported identifiers from the AST to build a list of forwarding
-	// declarations.
-	//
-	// TODO: Consider whether this should generate recursive aliases. e.g.,
-	// if a.proto publicly imports b.proto publicly imports c.proto, should
-	// a.pb.go contain aliases for symbols defined in c.proto?
-	var enums []*protogen.Enum
-	enums = append(enums, impFile.Enums...)
-	walkMessages(impFile.Messages, func(message *protogen.Message) {
-		if message.Desc.IsMapEntry() {
+
+	// Generate public imports by generating the imported file, parsing it,
+	// and extracting every symbol that should receive a forwarding declaration.
+	impGen := gen.NewGeneratedFile("temp.go", impFile.GoImportPath)
+	impGen.Skip()
+	GenerateFile(gen, impFile, impGen)
+	b, err := impGen.Content()
+	if err != nil {
+		gen.Error(err)
+		return
+	}
+	fset := token.NewFileSet()
+	astFile, err := parser.ParseFile(fset, "", b, parser.ParseComments)
+	if err != nil {
+		gen.Error(err)
+		return
+	}
+	genForward := func(tok token.Token, name string, expr ast.Expr) {
+		// Don't import unexported symbols.
+		r, _ := utf8.DecodeRuneInString(name)
+		if !unicode.IsUpper(r) {
 			return
 		}
-		enums = append(enums, message.Enums...)
-		for _, field := range message.Fields {
-			if !fieldHasDefault(field) {
-				continue
-			}
-			defVar := protogen.GoIdent{
-				GoImportPath: message.GoIdent.GoImportPath,
-				GoName:       "Default_" + message.GoIdent.GoName + "_" + field.GoName,
-			}
-			decl := "const"
-			if field.Desc.Kind() == protoreflect.BytesKind {
-				decl = "var"
-			}
-			g.P(decl, " ", defVar.GoName, " = ", defVar)
+		// Don't import the FileDescriptor.
+		if name == impFile.GoDescriptorIdent.GoName {
+			return
 		}
-		g.P("// ", message.GoIdent.GoName, " from public import ", imp.Path())
-		g.P("type ", message.GoIdent.GoName, " = ", message.GoIdent)
-		for _, oneof := range message.Oneofs {
-			for _, field := range oneof.Fields {
-				typ := fieldOneofType(field)
-				g.P("type ", typ.GoName, " = ", typ)
-			}
+		// Don't import decls referencing a symbol defined in another package.
+		// i.e., don't import decls which are themselves public imports:
+		//
+		//	type T = somepackage.T
+		if _, ok := expr.(*ast.SelectorExpr); ok {
+			return
 		}
-		g.P()
-	})
-	for _, enum := range enums {
-		g.P("// ", enum.GoIdent.GoName, " from public import ", imp.Path())
-		g.P("type ", enum.GoIdent.GoName, " = ", enum.GoIdent)
-		g.P("var ", enum.GoIdent.GoName, "_name = ", enum.GoIdent, "_name")
-		g.P("var ", enum.GoIdent.GoName, "_value = ", enum.GoIdent, "_value")
-		g.P()
-		for _, value := range enum.Values {
-			g.P("const ", value.GoIdent.GoName, " = ", enum.GoIdent.GoName, "(", value.GoIdent, ")")
-		}
+		g.P(tok, " ", name, " = ", impFile.GoImportPath.Ident(name))
 	}
-	for _, ext := range impFile.Extensions {
-		ident := extensionVar(impFile, ext)
-		g.P("var ", ident.GoName, " = ", ident)
-		g.P()
+	g.P("// Symbols defined in public import of ", imp.Path())
+	g.P()
+	for _, decl := range astFile.Decls {
+		switch decl := decl.(type) {
+		case *ast.GenDecl:
+			for _, spec := range decl.Specs {
+				switch spec := spec.(type) {
+				case *ast.TypeSpec:
+					genForward(decl.Tok, spec.Name.Name, spec.Type)
+				case *ast.ValueSpec:
+					for i, name := range spec.Names {
+						var expr ast.Expr
+						if i < len(spec.Values) {
+							expr = spec.Values[i]
+						}
+						genForward(decl.Tok, name.Name, expr)
+					}
+				case *ast.ImportSpec:
+				default:
+					panic(fmt.Sprintf("can't generate forward for spec type %T", spec))
+				}
+			}
+		}
 	}
 	g.P()
 }
@@ -210,7 +249,7 @@ func genImport(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, imp
 func genFileDescriptor(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo) {
 	// Trim the source_code_info from the descriptor.
 	// Marshal and gzip it.
-	descProto := proto.Clone(f.Proto).(*descpb.FileDescriptorProto)
+	descProto := proto.Clone(f.Proto).(*descriptorpb.FileDescriptorProto)
 	descProto.SourceCodeInfo = nil
 	b, err := proto.Marshal(descProto)
 	if err != nil {
@@ -223,8 +262,6 @@ func genFileDescriptor(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileI
 	w.Close()
 	b = buf.Bytes()
 
-	g.P("func init() { proto.RegisterFile(", strconv.Quote(f.Desc.Path()), ", ", f.descriptorVar, ") }")
-	g.P()
 	g.P("var ", f.descriptorVar, " = []byte{")
 	g.P("// ", len(b), " bytes of a gzipped FileDescriptorProto")
 	for len(b) > 0 {
@@ -249,16 +286,20 @@ func genEnum(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, enum 
 	g.PrintLeadingComments(enum.Location)
 	g.Annotate(enum.GoIdent.GoName, enum.Location)
 	g.P("type ", enum.GoIdent, " int32",
-		deprecationComment(enum.Desc.Options().(*descpb.EnumOptions).GetDeprecated()))
+		deprecationComment(enum.Desc.Options().(*descriptorpb.EnumOptions).GetDeprecated()))
 	g.P("const (")
 	for _, value := range enum.Values {
 		g.PrintLeadingComments(value.Location)
 		g.Annotate(value.GoIdent.GoName, value.Location)
 		g.P(value.GoIdent, " ", enum.GoIdent, " = ", value.Desc.Number(),
-			deprecationComment(value.Desc.Options().(*descpb.EnumValueOptions).GetDeprecated()))
+			deprecationComment(value.Desc.Options().(*descriptorpb.EnumValueOptions).GetDeprecated()))
 	}
 	g.P(")")
 	g.P()
+
+	// Generate support for protobuf reflection.
+	genReflectEnum(gen, g, f, enum)
+
 	nameMap := enum.GoIdent.GoName + "_name"
 	g.P("var ", nameMap, " = map[int32]string{")
 	generated := make(map[protoreflect.EnumNumber]bool)
@@ -288,13 +329,13 @@ func genEnum(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, enum 
 		g.P()
 	}
 	g.P("func (x ", enum.GoIdent, ") String() string {")
-	g.P("return ", protoPackage.Ident("EnumName"), "(", enum.GoIdent, "_name, int32(x))")
+	g.P("return ", f.protoPackage().Ident("EnumName"), "(", enum.GoIdent, "_name, int32(x))")
 	g.P("}")
 	g.P()
 
-	if enum.Desc.Syntax() != protoreflect.Proto3 {
+	if enum.Desc.Syntax() == protoreflect.Proto2 {
 		g.P("func (x *", enum.GoIdent, ") UnmarshalJSON(data []byte) error {")
-		g.P("value, err := ", protoPackage.Ident("UnmarshalJSONEnum"), "(", enum.GoIdent, `_value, data, "`, enum.GoIdent, `")`)
+		g.P("value, err := ", f.protoPackage().Ident("UnmarshalJSONEnum"), "(", enum.GoIdent, `_value, data, "`, enum.GoIdent, `")`)
 		g.P("if err != nil {")
 		g.P("return err")
 		g.P("}")
@@ -340,13 +381,12 @@ func enumRegistryName(enum *protogen.Enum) string {
 }
 
 func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, message *protogen.Message) {
-
 	if message.Desc.IsMapEntry() {
 		return
 	}
 
 	hasComment := g.PrintLeadingComments(message.Location)
-	if message.Desc.Options().(*descpb.MessageOptions).GetDeprecated() {
+	if message.Desc.Options().(*descriptorpb.MessageOptions).GetDeprecated() {
 		if hasComment {
 			g.P("//")
 		}
@@ -383,34 +423,31 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 			)
 		}
 		g.Annotate(message.GoIdent.GoName+"."+field.GoName, field.Location)
-
-		if gogoproto.IsMarshaler(f.Proto, message.Desc.Options().(*descpb.MessageOptions)) {
-			genMarshalTo(gen, g, f, message)
-		}
-
 		g.P(field.GoName, " ", goType, " `", strings.Join(tags, " "), "`",
-			deprecationComment(field.Desc.Options().(*descpb.FieldOptions).GetDeprecated()))
+			deprecationComment(field.Desc.Options().(*descriptorpb.FieldOptions).GetDeprecated()))
 	}
 	g.P("XXX_NoUnkeyedLiteral struct{} `json:\"-\"`")
 
 	if message.Desc.ExtensionRanges().Len() > 0 {
 		var tags []string
-		if message.Desc.Options().(*descpb.MessageOptions).GetMessageSetWireFormat() {
+		if message.Desc.Options().(*descriptorpb.MessageOptions).GetMessageSetWireFormat() {
 			tags = append(tags, `protobuf_messageset:"1"`)
 		}
 		tags = append(tags, `json:"-"`)
-		g.P(protoPackage.Ident("XXX_InternalExtensions"), " `", strings.Join(tags, " "), "`")
+		g.P(f.protoPackage().Ident("XXX_InternalExtensions"), " `", strings.Join(tags, " "), "`")
 	}
-	// TODO XXX_InternalExtensions
 	g.P("XXX_unrecognized []byte `json:\"-\"`")
 	g.P("XXX_sizecache int32 `json:\"-\"`")
 	g.P("}")
 	g.P()
 
+	// Generate support for protobuf reflection.
+	genReflectMessage(gen, g, f, message)
+
 	// Reset
 	g.P("func (m *", message.GoIdent, ") Reset() { *m = ", message.GoIdent, "{} }")
 	// String
-	g.P("func (m *", message.GoIdent, ") String() string { return ", protoPackage.Ident("CompactTextString"), "(m) }")
+	g.P("func (m *", message.GoIdent, ") String() string { return ", f.protoPackage().Ident("CompactTextString"), "(m) }")
 	// ProtoMessage
 	g.P("func (*", message.GoIdent, ") ProtoMessage() {}")
 	// Descriptor
@@ -425,17 +462,7 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 
 	// ExtensionRangeArray
 	if extranges := message.Desc.ExtensionRanges(); extranges.Len() > 0 {
-		if message.Desc.Options().(*descpb.MessageOptions).GetMessageSetWireFormat() {
-			g.P("func (m *", message.GoIdent, ") MarshalJSON() ([]byte, error) {")
-			g.P("return ", protoPackage.Ident("MarshalMessageSetJSON"), "(&m.XXX_InternalExtensions)")
-			g.P("}")
-			g.P("func (m *", message.GoIdent, ") UnmarshalJSON(buf []byte) error {")
-			g.P("return ", protoPackage.Ident("UnmarshalMessageSetJSON"), "(buf, &m.XXX_InternalExtensions)")
-			g.P("}")
-			g.P()
-		}
-
-		protoExtRange := protoPackage.Ident("ExtensionRange")
+		protoExtRange := f.protoPackage().Ident("ExtensionRange")
 		extRangeVar := "extRange_" + message.GoIdent.GoName
 		g.P("var ", extRangeVar, " = []", protoExtRange, " {")
 		for i := 0; i < extranges.Len(); i++ {
@@ -459,34 +486,39 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 	// table-driven approach. Instead, we should only add a single method
 	// that allows getting access to the *InternalMessageInfo struct and then
 	// calling Unmarshal, Marshal, Merge, Size, and Discard directly on that.
-	messageInfoVar := "xxx_messageInfo_" + message.GoIdent.GoName
-	// XXX_Unmarshal
-	g.P("func (m *", message.GoIdent, ") XXX_Unmarshal(b []byte) error {")
-	g.P("return ", messageInfoVar, ".Unmarshal(m, b)")
-	g.P("}")
-	// XXX_Marshal
-	g.P("func (m *", message.GoIdent, ") XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {")
-	g.P("return ", messageInfoVar, ".Marshal(b, m, deterministic)")
-	g.P("}")
-	// XXX_Merge
-	g.P("func (m *", message.GoIdent, ") XXX_Merge(src proto.Message) {")
-	g.P(messageInfoVar, ".Merge(m, src)")
-	g.P("}")
-	// XXX_Size
-	g.P("func (m *", message.GoIdent, ") XXX_Size() int {")
-	g.P("return ", messageInfoVar, ".Size(m)")
-	g.P("}")
-	// XXX_DiscardUnknown
-	g.P("func (m *", message.GoIdent, ") XXX_DiscardUnknown() {")
-	g.P(messageInfoVar, ".DiscardUnknown(m)")
-	g.P("}")
-	g.P()
-	g.P("var ", messageInfoVar, " ", protoPackage.Ident("InternalMessageInfo"))
-	g.P()
+	if !isDescriptor(f.File) {
+		// NOTE: We avoid adding table-driven support for descriptor proto
+		// since this depends on the v1 proto package, which would eventually
+		// need to depend on the descriptor itself.
+		messageInfoVar := "xxx_messageInfo_" + message.GoIdent.GoName
+		// XXX_Unmarshal
+		g.P("func (m *", message.GoIdent, ") XXX_Unmarshal(b []byte) error {")
+		g.P("return ", messageInfoVar, ".Unmarshal(m, b)")
+		g.P("}")
+		// XXX_Marshal
+		g.P("func (m *", message.GoIdent, ") XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {")
+		g.P("return ", messageInfoVar, ".Marshal(b, m, deterministic)")
+		g.P("}")
+		// XXX_Merge
+		g.P("func (m *", message.GoIdent, ") XXX_Merge(src proto.Message) {")
+		g.P(messageInfoVar, ".Merge(m, src)")
+		g.P("}")
+		// XXX_Size
+		g.P("func (m *", message.GoIdent, ") XXX_Size() int {")
+		g.P("return ", messageInfoVar, ".Size(m)")
+		g.P("}")
+		// XXX_DiscardUnknown
+		g.P("func (m *", message.GoIdent, ") XXX_DiscardUnknown() {")
+		g.P(messageInfoVar, ".DiscardUnknown(m)")
+		g.P("}")
+		g.P()
+		g.P("var ", messageInfoVar, " ", protoPackage.Ident("InternalMessageInfo"))
+		g.P()
+	}
 
 	// Constants and vars holding the default values of fields.
 	for _, field := range message.Fields {
-		if !fieldHasDefault(field) {
+		if !field.Desc.HasDefault() {
 			continue
 		}
 		defVarName := "Default_" + message.GoIdent.GoName + "_" + field.GoName
@@ -543,7 +575,7 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 		}
 		goType, pointer := fieldGoType(g, field)
 		defaultValue := fieldDefaultValue(g, message, field)
-		if field.Desc.Options().(*descpb.FieldOptions).GetDeprecated() {
+		if field.Desc.Options().(*descriptorpb.FieldOptions).GetDeprecated() {
 			g.P(deprecationComment(true))
 		}
 		g.Annotate(message.GoIdent.GoName+".Get"+field.GoName, field.Location)
@@ -571,10 +603,7 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 	}
 
 	if len(message.Oneofs) > 0 {
-		genOneofFuncs(gen, g, f, message)
-	}
-	for _, extension := range message.Extensions {
-		genExtension(gen, g, f, extension)
+		genOneofWrappers(gen, g, f, message)
 	}
 }
 
@@ -637,7 +666,7 @@ func fieldDefaultValue(g *protogen.GeneratedFile, message *protogen.Message, fie
 	if field.Desc.Cardinality() == protoreflect.Repeated {
 		return "nil"
 	}
-	if fieldHasDefault(field) {
+	if field.Desc.HasDefault() {
 		defVarName := "Default_" + message.GoIdent.GoName + "_" + field.GoName
 		if field.Desc.Kind() == protoreflect.BytesKind {
 			return "append([]byte(nil), " + defVarName + "...)"
@@ -658,26 +687,6 @@ func fieldDefaultValue(g *protogen.GeneratedFile, message *protogen.Message, fie
 	}
 }
 
-// fieldHasDefault returns true if we consider a field to have a default value.
-//
-// For consistency with the previous generator, it returns false for fields with
-// [default=""], preventing the generation of a default const or var for these
-// fields.
-//
-// TODO: Drop this special case.
-func fieldHasDefault(field *protogen.Field) bool {
-	if !field.Desc.HasDefault() {
-		return false
-	}
-	switch field.Desc.Kind() {
-	case protoreflect.StringKind:
-		return field.Desc.Default().String() != ""
-	case protoreflect.BytesKind:
-		return len(field.Desc.Default().Bytes()) > 0
-	}
-	return true
-}
-
 func fieldJSONTag(field *protogen.Field) string {
 	return string(field.Desc.Name()) + ",omitempty"
 }
@@ -696,7 +705,7 @@ func genExtension(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, 
 		name = n
 	}
 
-	g.P("var ", extensionVar(f.File, extension), " = &", protoPackage.Ident("ExtensionDesc"), "{")
+	g.P("var ", extensionVar(f.File, extension), " = &", f.protoPackage().Ident("ExtensionDesc"), "{")
 	g.P("ExtendedType: (*", extension.ExtendedType.GoIdent, ")(nil),")
 	goType, pointer := fieldGoType(g, extension)
 	if pointer {
@@ -714,7 +723,7 @@ func genExtension(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, 
 // isExtensionMessageSetELement returns the adjusted name of an extension
 // which extends proto2.bridge.MessageSet.
 func isExtensionMessageSetElement(extension *protogen.Extension) (name protoreflect.FullName, ok bool) {
-	opts := extension.ExtendedType.Desc.Options().(*descpb.MessageOptions)
+	opts := extension.ExtendedType.Desc.Options().(*descriptorpb.MessageOptions)
 	if !opts.GetMessageSetWireFormat() || extension.Desc.Name() != "message_set_extension" {
 		return "", false
 	}
@@ -747,26 +756,19 @@ func extensionVar(f *protogen.File, extension *protogen.Extension) protogen.GoId
 // genInitFunction generates an init function that registers the types in the
 // generated file with the proto package.
 func genInitFunction(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo) {
-	if len(f.allMessages) == 0 && len(f.allEnums) == 0 && len(f.allExtensions) == 0 {
-		return
-	}
-
 	g.P("func init() {")
+	g.P(f.protoPackage().Ident("RegisterFile"), "(", strconv.Quote(f.Desc.Path()), ", ", f.descriptorVar, ")")
 	for _, enum := range f.allEnums {
 		name := enum.GoIdent.GoName
-		g.P(protoPackage.Ident("RegisterEnum"), fmt.Sprintf("(%q, %s_name, %s_value)", enumRegistryName(enum), name, name))
+		g.P(f.protoPackage().Ident("RegisterEnum"), fmt.Sprintf("(%q, %s_name, %s_value)", enumRegistryName(enum), name, name))
 	}
 	for _, message := range f.allMessages {
 		if message.Desc.IsMapEntry() {
 			continue
 		}
 
-		for _, extension := range message.Extensions {
-			genRegisterExtension(gen, g, f, extension)
-		}
-
 		name := message.GoIdent.GoName
-		g.P(protoPackage.Ident("RegisterType"), fmt.Sprintf("((*%s)(nil), %q)", name, message.Desc.FullName()))
+		g.P(f.protoPackage().Ident("RegisterType"), fmt.Sprintf("((*%s)(nil), %q)", name, message.Desc.FullName()))
 
 		// Types of map fields, sorted by the name of the field message type.
 		var mapFields []*protogen.Field
@@ -783,25 +785,14 @@ func genInitFunction(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInf
 		for _, field := range mapFields {
 			typeName := string(field.MessageType.Desc.FullName())
 			goType, _ := fieldGoType(g, field)
-			g.P(protoPackage.Ident("RegisterMapType"), fmt.Sprintf("((%v)(nil), %q)", goType, typeName))
+			g.P(f.protoPackage().Ident("RegisterMapType"), fmt.Sprintf("((%v)(nil), %q)", goType, typeName))
 		}
 	}
-	for _, extension := range f.Extensions {
-		genRegisterExtension(gen, g, f, extension)
+	for _, extension := range f.allExtensions {
+		g.P(f.protoPackage().Ident("RegisterExtension"), "(", extensionVar(f.File, extension), ")")
 	}
 	g.P("}")
 	g.P()
-}
-
-func genRegisterExtension(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, extension *protogen.Extension) {
-	g.P(protoPackage.Ident("RegisterExtension"), "(", extensionVar(f.File, extension), ")")
-	if name, ok := isExtensionMessageSetElement(extension); ok {
-		goType, pointer := fieldGoType(g, extension)
-		if pointer {
-			goType = "*" + goType
-		}
-		g.P(protoPackage.Ident("RegisterMessageSetType"), "((", goType, ")(nil), ", extension.Desc.Number(), ",", strconv.Quote(string(name)), ")")
-	}
 }
 
 // deprecationComment returns a standard deprecation comment if deprecated is true.
@@ -841,7 +832,115 @@ var wellKnownTypes = map[protoreflect.FullName]bool{
 	"google.protobuf.Value":       true,
 }
 
+// genOneofField generates the struct field for a oneof.
+func genOneofField(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, message *protogen.Message, oneof *protogen.Oneof) {
+	if g.PrintLeadingComments(oneof.Location) {
+		g.P("//")
+	}
+	g.P("// Types that are valid to be assigned to ", oneofFieldName(oneof), ":")
+	for _, field := range oneof.Fields {
+		g.PrintLeadingComments(field.Location)
+		g.P("//\t*", fieldOneofType(field))
+	}
+	g.Annotate(message.GoIdent.GoName+"."+oneofFieldName(oneof), oneof.Location)
+	g.P(oneofFieldName(oneof), " ", oneofInterfaceName(oneof), " `protobuf_oneof:\"", oneof.Desc.Name(), "\"`")
+}
 
-func genMarshalTo(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, message *protogen.Message) {
-	g.P(`MarshalTo([]byte) (int, error)`)
+// genOneofTypes generates the interface type used for a oneof field,
+// and the wrapper types that satisfy that interface.
+//
+// It also generates the getter method for the parent oneof field
+// (but not the member fields).
+func genOneofTypes(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, message *protogen.Message, oneof *protogen.Oneof) {
+	ifName := oneofInterfaceName(oneof)
+	g.P("type ", ifName, " interface {")
+	g.P(ifName, "()")
+	g.P("}")
+	g.P()
+	for _, field := range oneof.Fields {
+		name := fieldOneofType(field)
+		g.Annotate(name.GoName, field.Location)
+		g.Annotate(name.GoName+"."+field.GoName, field.Location)
+		g.P("type ", name, " struct {")
+		goType, _ := fieldGoType(g, field)
+		tags := []string{
+			fmt.Sprintf("protobuf:%q", fieldProtobufTag(field)),
+		}
+		g.P(field.GoName, " ", goType, " `", strings.Join(tags, " "), "`")
+		g.P("}")
+		g.P()
+	}
+	for _, field := range oneof.Fields {
+		g.P("func (*", fieldOneofType(field), ") ", ifName, "() {}")
+		g.P()
+	}
+	g.Annotate(message.GoIdent.GoName+".Get"+oneof.GoName, oneof.Location)
+	g.P("func (m *", message.GoIdent.GoName, ") Get", oneof.GoName, "() ", ifName, " {")
+	g.P("if m != nil {")
+	g.P("return m.", oneofFieldName(oneof))
+	g.P("}")
+	g.P("return nil")
+	g.P("}")
+	g.P()
+}
+
+// oneofFieldName returns the name of the struct field holding the oneof value.
+//
+// This function is trivial, but pulling out the name like this makes it easier
+// to experiment with alternative oneof implementations.
+func oneofFieldName(oneof *protogen.Oneof) string {
+	return oneof.GoName
+}
+
+// oneofInterfaceName returns the name of the interface type implemented by
+// the oneof field value types.
+func oneofInterfaceName(oneof *protogen.Oneof) string {
+	return fmt.Sprintf("is%s_%s", oneof.ParentMessage.GoIdent.GoName, oneof.GoName)
+}
+
+// genOneofWrappers generates the XXX_OneofWrappers method for a message.
+func genOneofWrappers(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, message *protogen.Message) {
+	g.P("// XXX_OneofWrappers is for the internal use of the proto package.")
+	g.P("func (*", message.GoIdent.GoName, ") XXX_OneofWrappers() []interface{} {")
+	g.P("return []interface{}{")
+	for _, oneof := range message.Oneofs {
+		for _, field := range oneof.Fields {
+			g.P("(*", fieldOneofType(field), ")(nil),")
+		}
+	}
+	g.P("}")
+	g.P("}")
+	g.P()
+}
+
+// fieldOneofType returns the wrapper type used to represent a field in a oneof.
+func fieldOneofType(field *protogen.Field) protogen.GoIdent {
+	ident := protogen.GoIdent{
+		GoImportPath: field.ParentMessage.GoIdent.GoImportPath,
+		GoName:       field.ParentMessage.GoIdent.GoName + "_" + field.GoName,
+	}
+	// Check for collisions with nested messages or enums.
+	//
+	// This conflict resolution is incomplete: Among other things, it
+	// does not consider collisions with other oneof field types.
+	//
+	// TODO: Consider dropping this entirely. Detecting conflicts and
+	// producing an error is almost certainly better than permuting
+	// field and type names in mostly unpredictable ways.
+Loop:
+	for {
+		for _, message := range field.ParentMessage.Messages {
+			if message.GoIdent == ident {
+				ident.GoName += "_"
+				continue Loop
+			}
+		}
+		for _, enum := range field.ParentMessage.Enums {
+			if enum.GoIdent == ident {
+				ident.GoName += "_"
+				continue Loop
+			}
+		}
+		return ident
+	}
 }

@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/gogo/protobuf/internal/detrand"
 	"github.com/gogo/protobuf/internal/errors"
 )
 
@@ -113,10 +114,21 @@ func (p *encoder) marshalMessage(v Value, emitDelims bool) error {
 		if len(p.indent) > 0 {
 			p.out = append(p.out, ' ')
 		}
+		// For multi-line output, add a random extra space after key: per message to
+		// make output unstable.
+		if len(p.indent) > 0 && detrand.Bool() {
+			p.out = append(p.out, ' ')
+		}
+
 		if err := p.marshalValue(item[1]); !p.nerr.Merge(err) {
 			return err
 		}
 		if i < len(items)-1 && len(p.indent) == 0 {
+			p.out = append(p.out, ' ')
+		}
+		// For single-line output, add a random extra space after a field per message to
+		// make output unstable.
+		if len(p.indent) == 0 && detrand.Bool() && i != len(items)-1 {
 			p.out = append(p.out, ' ')
 		}
 		p.out = append(p.out, p.newline...)
