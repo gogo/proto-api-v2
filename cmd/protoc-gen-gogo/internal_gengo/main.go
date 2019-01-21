@@ -21,6 +21,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/gogo/protobuf/gogoproto"
 	"github.com/golang/protobuf/proto"
 	"github.com/gogo/protobuf/internal/encoding/tag"
 	"github.com/golang/protobuf/v2/protogen"
@@ -423,6 +424,11 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 			)
 		}
 		g.Annotate(message.GoIdent.GoName+"."+field.GoName, field.Location)
+
+		if gogoproto.IsMarshaler(f.Proto, message.Desc.Options().(*descriptorpb.MessageOptions)) {
+			//genMarshalTo(gen, g, f, message)
+		}
+
 		g.P(field.GoName, " ", goType, " `", strings.Join(tags, " "), "`",
 			deprecationComment(field.Desc.Options().(*descriptorpb.FieldOptions).GetDeprecated()))
 	}
