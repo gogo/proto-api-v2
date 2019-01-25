@@ -42,6 +42,14 @@ func IsUnmarshaler(file *descriptorpb.FileDescriptorProto, messageOptions proto.
 	return GetBoolExtension(messageOptions, E_Marshaler, GetBoolExtension(file.Options, E_UnmarshalerAll, false))
 }
 
+func IsCastType(fieldOptions proto.Message) bool {
+	typ := GetCastType(fieldOptions)
+	if len(typ) > 0 {
+		return true
+	}
+	return false
+}
+
 func GetBoolExtension(pb proto.Message, extension *proto.ExtensionDesc, ifnotset bool) bool {
 	if reflect.ValueOf(pb).IsNil() {
 		return ifnotset
@@ -59,9 +67,9 @@ func GetBoolExtension(pb proto.Message, extension *proto.ExtensionDesc, ifnotset
 	return *(value.(*bool))
 }
 
-func GetCastType(fileldOptions *descriptorpb.FieldOptions) string {
-	if fileldOptions != nil {
-		v, err := proto.GetExtension(fileldOptions, E_Casttype)
+func GetCastType(fieldOptions proto.Message) string {
+	if fieldOptions != nil {
+		v, err := proto.GetExtension(fieldOptions, E_Casttype)
 		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
 		}
