@@ -25,10 +25,10 @@ func main() {
 	)
 	protogen.Run(opts, func(gen *protogen.Plugin) error {
 		if *plugins != "" {
-			return errors.New("protoc-gen-go: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC")
+			return errors.New("protoc-gen-gogo: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC")
 		}
 		if *importPrefix != "" {
-			return errors.New("protoc-gen-go: import_prefix is not supported")
+			return errors.New("protoc-gen-gogo: import_prefix is not supported")
 		}
 		for _, f := range gen.Files {
 			if !f.Generate {

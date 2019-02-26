@@ -425,10 +425,6 @@ func genMessage(gen *protogen.Plugin, g *protogen.GeneratedFile, f *fileInfo, me
 		}
 		g.Annotate(message.GoIdent.GoName+"."+field.GoName, field.Location)
 
-		if gogoproto.IsCastType(field.Desc.Options().(*descriptorpb.FieldOptions)) {
-			panic("hello")
-		}
-
 		g.P(field.GoName, " ", goType, " `", strings.Join(tags, " "), "`",
 			deprecationComment(field.Desc.Options().(*descriptorpb.FieldOptions).GetDeprecated()))
 	}
@@ -657,7 +653,42 @@ func fieldGoType(g *protogen.GeneratedFile, field *protogen.Field) (goType strin
 	if field.Desc.Syntax() == protoreflect.Proto3 && field.Desc.ExtendedType() == nil {
 		pointer = false
 	}
+
+	if gogoproto.IsCastType(field.Desc.Options().(*descriptorpb.FieldOptions)) {
+		raw := gogoproto.GetCastType(field.Desc.Options().(*descriptorpb.FieldOptions))
+		packag,	typ  := splitCPackageType(raw)
+		if len(packag) > 0 {
+			goIdent := protogen.GoIdent{GoName: typ, GoImportPath: protogen.GoImportPath(packag)}
+			goType = g.QualifiedGoIdent(goIdent)
+		} else {
+			goType = typ
+		}
+		pointer = false
+		if gogoproto.IsNullable(field.Desc.Options().(*descriptorpb.FieldOptions)) {
+			pointer = true
+		}
+	}
 	return goType, pointer
+}
+
+func splitCPackageType(ctype string) (packageName string, typ string) {
+	ss := strings.Split(ctype, ".")
+	if len(ss) == 1 {
+		return "", ctype
+	}
+	packageName = strings.Join(ss[0:len(ss)-1], ".")
+	typeName := ss[len(ss)-1]
+	return packageName, typeName
+}
+
+// badToUnderscore is the mapping function used to generate Go names from package names,
+// which can be dotted in the input .proto file.  It replaces non-identifier characters such as
+// dot or dash with underscore.
+func badToUnderscore(r rune) rune {
+	if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
+		return r
+	}
+	return '_'
 }
 
 func fieldProtobufTag(field *protogen.Field) string {

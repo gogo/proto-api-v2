@@ -34,6 +34,10 @@ import (
 	proto "github.com/golang/protobuf/proto"
 )
 
+func IsNullable(fieldOptions proto.Message) bool {
+	return GetBoolExtension(fieldOptions, E_Nullable, true)
+}
+
 func IsMarshaler(file *descriptorpb.FileDescriptorProto, messageOptions proto.Message) bool {
 	return GetBoolExtension(messageOptions, E_Marshaler, GetBoolExtension(file.Options, E_MarshalerAll, false))
 }
