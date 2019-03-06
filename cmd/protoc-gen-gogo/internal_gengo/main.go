@@ -654,8 +654,8 @@ func fieldGoType(g *protogen.GeneratedFile, field *protogen.Field) (goType strin
 		pointer = false
 	}
 
-	if gogoproto.IsCastType(field.Desc.Options().(*descriptorpb.FieldOptions)) {
-		raw := gogoproto.GetCastType(field.Desc.Options().(*descriptorpb.FieldOptions))
+	if gogoproto.IsCastType(field) {
+		raw := gogoproto.GetCastType(field)
 		packag,	typ  := splitCPackageType(raw)
 		if len(packag) > 0 {
 			goIdent := protogen.GoIdent{GoName: typ, GoImportPath: protogen.GoImportPath(packag)}
@@ -696,7 +696,11 @@ func fieldProtobufTag(field *protogen.Field) string {
 	if field.Desc.Kind() == protoreflect.EnumKind {
 		enumName = enumRegistryName(field.EnumType)
 	}
-	return tag.Marshal(field.Desc, enumName)
+	casttype := "'"
+	if gogoproto.IsCastType(field) {
+		casttype = ",casttype=" + gogoproto.GetCastType(field)
+	}
+	return tag.Marshal(field.Desc, enumName) + casttype
 }
 
 func fieldDefaultValue(g *protogen.GeneratedFile, message *protogen.Message, field *protogen.Field) string {

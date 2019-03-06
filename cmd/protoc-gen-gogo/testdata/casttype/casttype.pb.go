@@ -16,22 +16,22 @@ import (
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Castaway struct {
-	Int32Ptr             *int32                  `protobuf:"varint,1,opt,name=Int32Ptr" json:"Int32Ptr,omitempty"`
-	Int32                int32                   `protobuf:"varint,2,opt,name=Int32" json:"Int32,omitempty"`
-	MyUint64Ptr          *casttype.MyUint64Type  `protobuf:"varint,3,opt,name=MyUint64Ptr" json:"MyUint64Ptr,omitempty"`
-	MyUint64             casttype.MyUint64Type   `protobuf:"varint,4,opt,name=MyUint64" json:"MyUint64,omitempty"`
-	MyFloat32Ptr         *casttype.MyFloat32Type `protobuf:"fixed32,5,opt,name=MyFloat32Ptr" json:"MyFloat32Ptr,omitempty"`
-	MyFloat32            casttype.MyFloat32Type  `protobuf:"fixed32,6,opt,name=MyFloat32" json:"MyFloat32,omitempty"`
-	MyFloat64Ptr         *casttype.MyFloat64Type `protobuf:"fixed64,7,opt,name=MyFloat64Ptr" json:"MyFloat64Ptr,omitempty"`
-	MyFloat64            casttype.MyFloat64Type  `protobuf:"fixed64,8,opt,name=MyFloat64" json:"MyFloat64,omitempty"`
-	MyBytes              *casttype.Bytes         `protobuf:"bytes,9,opt,name=MyBytes" json:"MyBytes,omitempty"`
-	NormalBytes          []byte                  `protobuf:"bytes,10,opt,name=NormalBytes" json:"NormalBytes,omitempty"`
-	MyUint64S            *casttype.MyUint64Type  `protobuf:"varint,11,rep,name=MyUint64s" json:"MyUint64s,omitempty"`
-	MyMap                map[string]uint64       `protobuf:"bytes,12,rep,name=MyMap" json:"MyMap,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
-	MyCustomMap          map[string]uint64       `protobuf:"bytes,13,rep,name=MyCustomMap" json:"MyCustomMap,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
-	MyNullableMap        map[int32]*Wilson       `protobuf:"bytes,14,rep,name=MyNullableMap" json:"MyNullableMap,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	MyEmbeddedMap        map[int32]*Wilson       `protobuf:"bytes,15,rep,name=MyEmbeddedMap" json:"MyEmbeddedMap,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	String_              *casttype.MyStringType  `protobuf:"bytes,16,opt,name=String" json:"String,omitempty"`
+	Int32Ptr             *int32                  `protobuf:"varint,1,opt,name=Int32Ptr,casttype=int32" json:"Int32Ptr,omitempty"`
+	Int32                int32                   `protobuf:"varint,2,opt,name=Int32,casttype=int32" json:"Int32,omitempty"`
+	MyUint64Ptr          *casttype.MyUint64Type  `protobuf:"varint,3,opt,name=MyUint64Ptr,casttype=github.com/gogo/protobuf/test/casttype.MyUint64Type" json:"MyUint64Ptr,omitempty"`
+	MyUint64             casttype.MyUint64Type   `protobuf:"varint,4,opt,name=MyUint64,casttype=github.com/gogo/protobuf/test/casttype.MyUint64Type" json:"MyUint64,omitempty"`
+	MyFloat32Ptr         *casttype.MyFloat32Type `protobuf:"fixed32,5,opt,name=MyFloat32Ptr,casttype=github.com/gogo/protobuf/test/casttype.MyFloat32Type" json:"MyFloat32Ptr,omitempty"`
+	MyFloat32            casttype.MyFloat32Type  `protobuf:"fixed32,6,opt,name=MyFloat32,casttype=github.com/gogo/protobuf/test/casttype.MyFloat32Type" json:"MyFloat32,omitempty"`
+	MyFloat64Ptr         *casttype.MyFloat64Type `protobuf:"fixed64,7,opt,name=MyFloat64Ptr,casttype=github.com/gogo/protobuf/test/casttype.MyFloat64Type" json:"MyFloat64Ptr,omitempty"`
+	MyFloat64            casttype.MyFloat64Type  `protobuf:"fixed64,8,opt,name=MyFloat64,casttype=github.com/gogo/protobuf/test/casttype.MyFloat64Type" json:"MyFloat64,omitempty"`
+	MyBytes              *casttype.Bytes         `protobuf:"bytes,9,opt,name=MyBytes,casttype=github.com/gogo/protobuf/test/casttype.Bytes" json:"MyBytes,omitempty"`
+	NormalBytes          []byte                  `protobuf:"bytes,10,opt,name=NormalBytes'" json:"NormalBytes,omitempty"`
+	MyUint64S            *casttype.MyUint64Type  `protobuf:"varint,11,rep,name=MyUint64s,casttype=github.com/gogo/protobuf/test/casttype.MyUint64Type" json:"MyUint64s,omitempty"`
+	MyMap                map[string]uint64       `protobuf:"bytes,12,rep,name=MyMap,casttype=github.com/gogo/protobuf/test/casttype.MyMapType" json:"MyMap,omitempty" protobuf_key:"bytes,1,opt,name=key'" protobuf_val:"varint,2,opt,name=value'"`
+	MyCustomMap          map[string]uint64       `protobuf:"bytes,13,rep,name=MyCustomMap'" json:"MyCustomMap,omitempty" protobuf_key:"bytes,1,opt,name=key'" protobuf_val:"varint,2,opt,name=value'"`
+	MyNullableMap        map[int32]*Wilson       `protobuf:"bytes,14,rep,name=MyNullableMap'" json:"MyNullableMap,omitempty" protobuf_key:"varint,1,opt,name=key'" protobuf_val:"bytes,2,opt,name=value'"`
+	MyEmbeddedMap        map[int32]*Wilson       `protobuf:"bytes,15,rep,name=MyEmbeddedMap'" json:"MyEmbeddedMap,omitempty" protobuf_key:"varint,1,opt,name=key'" protobuf_val:"bytes,2,opt,name=value'"`
+	String_              *casttype.MyStringType  `protobuf:"bytes,16,opt,name=String,casttype=github.com/gogo/protobuf/test/casttype.MyStringType" json:"String,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
 	XXX_unrecognized     []byte                  `json:"-"`
 	XXX_sizecache        int32                   `json:"-"`
@@ -175,7 +175,7 @@ func (m *Castaway) GetString_() casttype.MyStringType {
 }
 
 type Wilson struct {
-	Int64                *int64   `protobuf:"varint,1,opt,name=Int64" json:"Int64,omitempty"`
+	Int64                *int64   `protobuf:"varint,1,opt,name=Int64'" json:"Int64,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`

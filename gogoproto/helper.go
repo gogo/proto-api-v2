@@ -32,6 +32,7 @@ import (
 	"reflect"
 	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
 	proto "github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/v2/protogen"
 )
 
 func IsNullable(fieldOptions proto.Message) bool {
@@ -46,8 +47,8 @@ func IsUnmarshaler(file *descriptorpb.FileDescriptorProto, messageOptions proto.
 	return GetBoolExtension(messageOptions, E_Marshaler, GetBoolExtension(file.Options, E_UnmarshalerAll, false))
 }
 
-func IsCastType(fieldOptions proto.Message) bool {
-	typ := GetCastType(fieldOptions)
+func IsCastType(field *protogen.Field) bool {
+	typ := GetCastType(field)
 	if len(typ) > 0 {
 		return true
 	}
@@ -71,7 +72,8 @@ func GetBoolExtension(pb proto.Message, extension *proto.ExtensionDesc, ifnotset
 	return *(value.(*bool))
 }
 
-func GetCastType(fieldOptions proto.Message) string {
+func GetCastType(field *protogen.Field) string {
+	fieldOptions := field.Desc.Options().(*descriptorpb.FieldOptions)
 	if fieldOptions != nil {
 		v, err := proto.GetExtension(fieldOptions, E_Casttype)
 		if err == nil && v.(*string) != nil {
