@@ -16,6 +16,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/gogo/protobuf/gogoproto"
 	"google.golang.org/protobuf/compiler/protogen"
 	"github.com/gogo/protobuf/internal/encoding/tag"
 	"github.com/gogo/protobuf/internal/fieldnum"
@@ -579,6 +580,20 @@ func fieldGoType(g *protogen.GeneratedFile, field *protogen.Field) (goType strin
 	if field.Desc.Syntax() == protoreflect.Proto3 && !field.Desc.IsExtension() {
 		pointer = false
 	}
+	if gogoproto.IsCastType(field) {
+		raw := gogoproto.GetCastType(field)
+		packag,	typ  := splitCPackageType(raw)
+		if len(packag) > 0 {
+			goIdent := protogen.GoIdent{GoName: typ, GoImportPath: protogen.GoImportPath(packag)}
+			goType = g.QualifiedGoIdent(goIdent)
+		} else {
+			goType = typ
+		}
+		pointer = false
+		if gogoproto.IsNullable(field.Desc.Options().(*descriptorpb.FieldOptions)) {
+			pointer = true
+		}
+	}
 	return goType, pointer
 }
 
@@ -587,7 +602,11 @@ func fieldProtobufTag(field *protogen.Field) string {
 	if field.Desc.Kind() == protoreflect.EnumKind {
 		enumName = enumLegacyName(field.Enum)
 	}
-	return tag.Marshal(field.Desc, enumName)
+	casttype := "'"
+	if gogoproto.IsCastType(field) {
+		casttype = ",casttype=" + gogoproto.GetCastType(field)
+	}
+	return tag.Marshal(field.Desc, enumName) + casttype
 }
 
 func fieldDefaultValue(g *protogen.GeneratedFile, message *protogen.Message, field *protogen.Field) string {
@@ -862,4 +881,14 @@ Loop:
 		}
 		return ident
 	}
+}
+
+func splitCPackageType(ctype string) (packageName string, typ string) {
+	ss := strings.Split(ctype, ".")
+	if len(ss) == 1 {
+		return "", ctype
+	}
+	packageName = strings.Join(ss[0:len(ss)-1], ".")
+	typeName := ss[len(ss)-1]
+	return packageName, typeName
 }
