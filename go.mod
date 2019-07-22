@@ -1,6 +1,7 @@
 module github.com/gogo/protobuf
 
 require (
-	github.com/golang/protobuf v1.2.1-0.20181205191652-7e65e513332f
-	github.com/golang/protobuf/v2 v2.0.0-20190115031900-66c365cf7239
+	github.com/golang/protobuf v1.3.1
+	github.com/google/go-cmp v0.3.0
+	google.golang.org/protobuf v0.0.0-20190703204651-15076350e84f
 )

@@ -30,9 +30,9 @@ package gogoproto
 
 import (
 	"reflect"
-	descriptorpb "github.com/golang/protobuf/v2/types/descriptor"
+	"google.golang.org/protobuf/types/descriptorpb"
 	proto "github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/v2/protogen"
+	"google.golang.org/protobuf/compiler/protogen"
 )
 
 func IsNullable(fieldOptions proto.Message) bool {

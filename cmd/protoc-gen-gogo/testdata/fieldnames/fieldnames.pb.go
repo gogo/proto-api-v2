@@ -4,17 +4,18 @@
 package fieldnames
 
 import (
-	proto "github.com/golang/protobuf/proto"
-	protoreflect "github.com/golang/protobuf/v2/reflect/protoreflect"
-	prototype "github.com/golang/protobuf/v2/reflect/prototype"
-	protoimpl "github.com/golang/protobuf/v2/runtime/protoimpl"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoiface "google.golang.org/protobuf/runtime/protoiface"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	sync "sync"
 )
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const (
+	// Verify that runtime/protoimpl is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 0)
+	// Verify that this generated code is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(0 - protoimpl.MinVersion)
+)
 
 // Assorted edge cases in field name conflict resolution.
 //
@@ -57,149 +58,188 @@ type Message struct {
 	//	*Message_OneofMessageConflict_
 	OneofConflictC       isMessage_OneofConflictC `protobuf_oneof:"oneof_conflict_c"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
-	XXX_unrecognized     []byte                   `json:"-"`
-	XXX_sizecache        int32                    `json:"-"`
+	XXX_unrecognized     protoimpl.UnknownFields  `json:"-"`
+	XXX_sizecache        protoimpl.SizeCache      `json:"-"`
 }
 
-type xxx_Message struct{ m *Message }
-
-func (m *Message) ProtoReflect() protoreflect.Message {
-	return xxx_Message{m}
-}
-func (m xxx_Message) Type() protoreflect.MessageType {
-	return xxx_Fieldnames_protoFile_MessageTypes[0].Type
-}
-func (m xxx_Message) KnownFields() protoreflect.KnownFields {
-	return xxx_Fieldnames_protoFile_MessageTypes[0].KnownFieldsOf(m.m)
-}
-func (m xxx_Message) UnknownFields() protoreflect.UnknownFields {
-	return xxx_Fieldnames_protoFile_MessageTypes[0].UnknownFieldsOf(m.m)
-}
-func (m xxx_Message) Interface() protoreflect.ProtoMessage {
-	return m.m
+func (x *Message) Reset() {
+	*x = Message{}
 }
 
-func (m *Message) Reset()         { *m = Message{} }
-func (m *Message) String() string { return proto.CompactTextString(m) }
-func (*Message) ProtoMessage()    {}
+func (x *Message) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Message) ProtoMessage() {}
+
+func (x *Message) ProtoReflect() protoreflect.Message {
+	return file_fieldnames_fieldnames_proto_msgTypes[0].MessageOf(x)
+}
+
+func (m *Message) XXX_Methods() *protoiface.Methods {
+	return file_fieldnames_fieldnames_proto_msgTypes[0].Methods()
+}
+
+// Deprecated: Use Message.ProtoReflect.Type instead.
 func (*Message) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6bbe3f70febb9403, []int{0}
+	return file_fieldnames_fieldnames_proto_rawDescGZIP(), []int{0}
 }
 
-func (m *Message) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Message.Unmarshal(m, b)
-}
-func (m *Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Message.Marshal(b, m, deterministic)
-}
-func (m *Message) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Message.Merge(m, src)
-}
-func (m *Message) XXX_Size() int {
-	return xxx_messageInfo_Message.Size(m)
-}
-func (m *Message) XXX_DiscardUnknown() {
-	xxx_messageInfo_Message.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Message proto.InternalMessageInfo
-
-func (m *Message) GetFieldOne() string {
-	if m != nil && m.FieldOne != nil {
-		return *m.FieldOne
+func (x *Message) GetFieldOne() string {
+	if x != nil && x.FieldOne != nil {
+		return *x.FieldOne
 	}
 	return ""
 }
 
-func (m *Message) GetFieldTwo() string {
-	if m != nil && m.FieldTwo != nil {
-		return *m.FieldTwo
+func (x *Message) GetFieldTwo() string {
+	if x != nil && x.FieldTwo != nil {
+		return *x.FieldTwo
 	}
 	return ""
 }
 
-func (m *Message) GetFieldThree() string {
-	if m != nil && m.FieldThree != nil {
-		return *m.FieldThree
+func (x *Message) GetFieldThree() string {
+	if x != nil && x.FieldThree != nil {
+		return *x.FieldThree
 	}
 	return ""
 }
 
-func (m *Message) GetField_Four() string {
-	if m != nil && m.Field_Four != nil {
-		return *m.Field_Four
+func (x *Message) GetField_Four() string {
+	if x != nil && x.Field_Four != nil {
+		return *x.Field_Four
 	}
 	return ""
 }
 
-func (m *Message) GetDescriptor_() string {
-	if m != nil && m.Descriptor_ != nil {
-		return *m.Descriptor_
+func (x *Message) GetDescriptor_() string {
+	if x != nil && x.Descriptor_ != nil {
+		return *x.Descriptor_
 	}
 	return ""
 }
 
-func (m *Message) GetMarshal_() string {
-	if m != nil && m.Marshal_ != nil {
-		return *m.Marshal_
+func (x *Message) GetMarshal_() string {
+	if x != nil && x.Marshal_ != nil {
+		return *x.Marshal_
 	}
 	return ""
 }
 
-func (m *Message) GetUnmarshal_() string {
-	if m != nil && m.Unmarshal_ != nil {
-		return *m.Unmarshal_
+func (x *Message) GetUnmarshal_() string {
+	if x != nil && x.Unmarshal_ != nil {
+		return *x.Unmarshal_
 	}
 	return ""
 }
 
-func (m *Message) GetProtoMessage_() string {
-	if m != nil && m.ProtoMessage_ != nil {
-		return *m.ProtoMessage_
+func (x *Message) GetProtoMessage_() string {
+	if x != nil && x.ProtoMessage_ != nil {
+		return *x.ProtoMessage_
 	}
 	return ""
 }
 
-func (m *Message) GetCamelCase() string {
-	if m != nil && m.CamelCase != nil {
-		return *m.CamelCase
+func (x *Message) GetCamelCase() string {
+	if x != nil && x.CamelCase != nil {
+		return *x.CamelCase
 	}
 	return ""
 }
 
-func (m *Message) GetCamelCase_() string {
-	if m != nil && m.CamelCase_ != nil {
-		return *m.CamelCase_
+func (x *Message) GetCamelCase_() string {
+	if x != nil && x.CamelCase_ != nil {
+		return *x.CamelCase_
 	}
 	return ""
 }
 
-func (m *Message) GetCamelCase__() string {
-	if m != nil && m.CamelCase__ != nil {
-		return *m.CamelCase__
+func (x *Message) GetCamelCase__() string {
+	if x != nil && x.CamelCase__ != nil {
+		return *x.CamelCase__
 	}
 	return ""
 }
 
-func (m *Message) GetCamelCase___() string {
-	if m != nil && m.CamelCase___ != nil {
-		return *m.CamelCase___
+func (x *Message) GetCamelCase___() string {
+	if x != nil && x.CamelCase___ != nil {
+		return *x.CamelCase___
 	}
 	return ""
 }
 
-func (m *Message) GetGetName() string {
-	if m != nil && m.GetName != nil {
-		return *m.GetName
+func (x *Message) GetGetName() string {
+	if x != nil && x.GetName != nil {
+		return *x.GetName
 	}
 	return ""
 }
 
-func (m *Message) GetName_() string {
-	if m != nil && m.Name_ != nil {
-		return *m.Name_
+func (x *Message) GetName_() string {
+	if x != nil && x.Name_ != nil {
+		return *x.Name_
 	}
 	return ""
+}
+
+func (m *Message) GetOneofConflictA_() isMessage_OneofConflictA_ {
+	if m != nil {
+		return m.OneofConflictA_
+	}
+	return nil
+}
+
+func (x *Message) GetOneofConflictA() string {
+	if x, ok := x.GetOneofConflictA_().(*Message_OneofConflictA); ok {
+		return x.OneofConflictA
+	}
+	return ""
+}
+
+func (m *Message) GetOneofConflictB() isMessage_OneofConflictB {
+	if m != nil {
+		return m.OneofConflictB
+	}
+	return nil
+}
+
+func (x *Message) GetOneofNoConflict() string {
+	if x, ok := x.GetOneofConflictB().(*Message_OneofNoConflict); ok {
+		return x.OneofNoConflict
+	}
+	return ""
+}
+
+func (x *Message) GetOneofConflictB_() string {
+	if x, ok := x.GetOneofConflictB().(*Message_OneofConflictB_); ok {
+		return x.OneofConflictB_
+	}
+	return ""
+}
+
+func (m *Message) GetOneofConflictC() isMessage_OneofConflictC {
+	if m != nil {
+		return m.OneofConflictC
+	}
+	return nil
+}
+
+func (x *Message) GetOneofMessageConflict() string {
+	if x, ok := x.GetOneofConflictC().(*Message_OneofMessageConflict_); ok {
+		return x.OneofMessageConflict
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Message) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*Message_OneofConflictA)(nil),
+		(*Message_OneofNoConflict)(nil),
+		(*Message_OneofConflictB_)(nil),
+		(*Message_OneofMessageConflict_)(nil),
+	}
 }
 
 type isMessage_OneofConflictA_ interface {
@@ -211,20 +251,6 @@ type Message_OneofConflictA struct {
 }
 
 func (*Message_OneofConflictA) isMessage_OneofConflictA_() {}
-
-func (m *Message) GetOneofConflictA_() isMessage_OneofConflictA_ {
-	if m != nil {
-		return m.OneofConflictA_
-	}
-	return nil
-}
-
-func (m *Message) GetOneofConflictA() string {
-	if x, ok := m.GetOneofConflictA_().(*Message_OneofConflictA); ok {
-		return x.OneofConflictA
-	}
-	return ""
-}
 
 type isMessage_OneofConflictB interface {
 	isMessage_OneofConflictB()
@@ -242,27 +268,6 @@ func (*Message_OneofNoConflict) isMessage_OneofConflictB() {}
 
 func (*Message_OneofConflictB_) isMessage_OneofConflictB() {}
 
-func (m *Message) GetOneofConflictB() isMessage_OneofConflictB {
-	if m != nil {
-		return m.OneofConflictB
-	}
-	return nil
-}
-
-func (m *Message) GetOneofNoConflict() string {
-	if x, ok := m.GetOneofConflictB().(*Message_OneofNoConflict); ok {
-		return x.OneofNoConflict
-	}
-	return ""
-}
-
-func (m *Message) GetOneofConflictB_() string {
-	if x, ok := m.GetOneofConflictB().(*Message_OneofConflictB_); ok {
-		return x.OneofConflictB_
-	}
-	return ""
-}
-
 type isMessage_OneofConflictC interface {
 	isMessage_OneofConflictC()
 }
@@ -273,309 +278,136 @@ type Message_OneofMessageConflict_ struct {
 
 func (*Message_OneofMessageConflict_) isMessage_OneofConflictC() {}
 
-func (m *Message) GetOneofConflictC() isMessage_OneofConflictC {
-	if m != nil {
-		return m.OneofConflictC
-	}
-	return nil
-}
-
-func (m *Message) GetOneofMessageConflict() string {
-	if x, ok := m.GetOneofConflictC().(*Message_OneofMessageConflict_); ok {
-		return x.OneofMessageConflict
-	}
-	return ""
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*Message) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*Message_OneofConflictA)(nil),
-		(*Message_OneofNoConflict)(nil),
-		(*Message_OneofConflictB_)(nil),
-		(*Message_OneofMessageConflict_)(nil),
-	}
-}
-
 type Message_OneofMessageConflict struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     protoimpl.UnknownFields `json:"-"`
+	XXX_sizecache        protoimpl.SizeCache     `json:"-"`
 }
 
-type xxx_Message_OneofMessageConflict struct{ m *Message_OneofMessageConflict }
-
-func (m *Message_OneofMessageConflict) ProtoReflect() protoreflect.Message {
-	return xxx_Message_OneofMessageConflict{m}
-}
-func (m xxx_Message_OneofMessageConflict) Type() protoreflect.MessageType {
-	return xxx_Fieldnames_protoFile_MessageTypes[1].Type
-}
-func (m xxx_Message_OneofMessageConflict) KnownFields() protoreflect.KnownFields {
-	return xxx_Fieldnames_protoFile_MessageTypes[1].KnownFieldsOf(m.m)
-}
-func (m xxx_Message_OneofMessageConflict) UnknownFields() protoreflect.UnknownFields {
-	return xxx_Fieldnames_protoFile_MessageTypes[1].UnknownFieldsOf(m.m)
-}
-func (m xxx_Message_OneofMessageConflict) Interface() protoreflect.ProtoMessage {
-	return m.m
+func (x *Message_OneofMessageConflict) Reset() {
+	*x = Message_OneofMessageConflict{}
 }
 
-func (m *Message_OneofMessageConflict) Reset()         { *m = Message_OneofMessageConflict{} }
-func (m *Message_OneofMessageConflict) String() string { return proto.CompactTextString(m) }
-func (*Message_OneofMessageConflict) ProtoMessage()    {}
+func (x *Message_OneofMessageConflict) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Message_OneofMessageConflict) ProtoMessage() {}
+
+func (x *Message_OneofMessageConflict) ProtoReflect() protoreflect.Message {
+	return file_fieldnames_fieldnames_proto_msgTypes[1].MessageOf(x)
+}
+
+func (m *Message_OneofMessageConflict) XXX_Methods() *protoiface.Methods {
+	return file_fieldnames_fieldnames_proto_msgTypes[1].Methods()
+}
+
+// Deprecated: Use Message_OneofMessageConflict.ProtoReflect.Type instead.
 func (*Message_OneofMessageConflict) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6bbe3f70febb9403, []int{0, 0}
+	return file_fieldnames_fieldnames_proto_rawDescGZIP(), []int{0, 0}
 }
 
-func (m *Message_OneofMessageConflict) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Message_OneofMessageConflict.Unmarshal(m, b)
-}
-func (m *Message_OneofMessageConflict) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Message_OneofMessageConflict.Marshal(b, m, deterministic)
-}
-func (m *Message_OneofMessageConflict) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Message_OneofMessageConflict.Merge(m, src)
-}
-func (m *Message_OneofMessageConflict) XXX_Size() int {
-	return xxx_messageInfo_Message_OneofMessageConflict.Size(m)
-}
-func (m *Message_OneofMessageConflict) XXX_DiscardUnknown() {
-	xxx_messageInfo_Message_OneofMessageConflict.DiscardUnknown(m)
+var File_fieldnames_fieldnames_proto protoreflect.FileDescriptor
+
+var file_fieldnames_fieldnames_proto_rawDesc = []byte{
+	0x0a, 0x1b, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x2f, 0x66, 0x69, 0x65,
+	0x6c, 0x64, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x19, 0x67,
+	0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2e, 0x66, 0x69,
+	0x65, 0x6c, 0x64, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x22, 0xb8, 0x05, 0x0a, 0x07, 0x4d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6f, 0x6e,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4f, 0x6e,
+	0x65, 0x12, 0x1a, 0x0a, 0x08, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x54, 0x77, 0x6f, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x54, 0x77, 0x6f, 0x12, 0x1e, 0x0a,
+	0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x54, 0x68, 0x72, 0x65, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x54, 0x68, 0x72, 0x65, 0x65, 0x12, 0x1e, 0x0a,
+	0x0b, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x5f, 0x66, 0x6f, 0x75, 0x72, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x46, 0x6f, 0x75, 0x72, 0x12, 0x1e, 0x0a,
+	0x0a, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x6f, 0x72, 0x18, 0x0a, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0a, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a,
+	0x07, 0x6d, 0x61, 0x72, 0x73, 0x68, 0x61, 0x6c, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x6d, 0x61, 0x72, 0x73, 0x68, 0x61, 0x6c, 0x12, 0x1c, 0x0a, 0x09, 0x75, 0x6e, 0x6d, 0x61, 0x72,
+	0x73, 0x68, 0x61, 0x6c, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x75, 0x6e, 0x6d, 0x61,
+	0x72, 0x73, 0x68, 0x61, 0x6c, 0x12, 0x23, 0x0a, 0x0d, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x5f, 0x6d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x43, 0x61,
+	0x6d, 0x65, 0x6c, 0x43, 0x61, 0x73, 0x65, 0x18, 0x14, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x43,
+	0x61, 0x6d, 0x65, 0x6c, 0x43, 0x61, 0x73, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x43, 0x61, 0x6d, 0x65,
+	0x6c, 0x43, 0x61, 0x73, 0x65, 0x5f, 0x18, 0x15, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x43, 0x61,
+	0x6d, 0x65, 0x6c, 0x43, 0x61, 0x73, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x61, 0x6d, 0x65, 0x6c,
+	0x5f, 0x63, 0x61, 0x73, 0x65, 0x18, 0x16, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x63, 0x61, 0x6d,
+	0x65, 0x6c, 0x43, 0x61, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x0b, 0x43, 0x61, 0x6d, 0x65, 0x6c, 0x43,
+	0x61, 0x73, 0x65, 0x5f, 0x5f, 0x18, 0x17, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x43, 0x61, 0x6d,
+	0x65, 0x6c, 0x43, 0x61, 0x73, 0x65, 0x12, 0x19, 0x0a, 0x08, 0x67, 0x65, 0x74, 0x5f, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x1e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x67, 0x65, 0x74, 0x4e, 0x61, 0x6d,
+	0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x1f, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x28, 0x0a, 0x0e, 0x4f, 0x6e, 0x65, 0x6f, 0x66, 0x43, 0x6f,
+	0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x41, 0x18, 0x28, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52,
+	0x0e, 0x4f, 0x6e, 0x65, 0x6f, 0x66, 0x43, 0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x41, 0x12,
+	0x2c, 0x0a, 0x11, 0x6f, 0x6e, 0x65, 0x6f, 0x66, 0x5f, 0x6e, 0x6f, 0x5f, 0x63, 0x6f, 0x6e, 0x66,
+	0x6c, 0x69, 0x63, 0x74, 0x18, 0x32, 0x20, 0x01, 0x28, 0x09, 0x48, 0x01, 0x52, 0x0f, 0x6f, 0x6e,
+	0x65, 0x6f, 0x66, 0x4e, 0x6f, 0x43, 0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x12, 0x28, 0x0a,
+	0x0e, 0x4f, 0x6e, 0x65, 0x6f, 0x66, 0x43, 0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x42, 0x18,
+	0x33, 0x20, 0x01, 0x28, 0x09, 0x48, 0x01, 0x52, 0x0e, 0x4f, 0x6e, 0x65, 0x6f, 0x66, 0x43, 0x6f,
+	0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x42, 0x12, 0x36, 0x0a, 0x16, 0x6f, 0x6e, 0x65, 0x6f, 0x66,
+	0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63,
+	0x74, 0x18, 0x3c, 0x20, 0x01, 0x28, 0x09, 0x48, 0x02, 0x52, 0x14, 0x6f, 0x6e, 0x65, 0x6f, 0x66,
+	0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x43, 0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x1a,
+	0x16, 0x0a, 0x14, 0x4f, 0x6e, 0x65, 0x6f, 0x66, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x43,
+	0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x42, 0x12, 0x0a, 0x10, 0x6f, 0x6e, 0x65, 0x6f, 0x66,
+	0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x5f, 0x61, 0x42, 0x12, 0x0a, 0x10, 0x6f,
+	0x6e, 0x65, 0x6f, 0x66, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x5f, 0x62, 0x42,
+	0x12, 0x0a, 0x10, 0x6f, 0x6e, 0x65, 0x6f, 0x66, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63,
+	0x74, 0x5f, 0x63, 0x42, 0x42, 0x5a, 0x40, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x67, 0x6f,
+	0x6c, 0x61, 0x6e, 0x67, 0x2e, 0x6f, 0x72, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2f, 0x63, 0x6d, 0x64, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2d, 0x67, 0x65, 0x6e,
+	0x2d, 0x67, 0x6f, 0x2f, 0x74, 0x65, 0x73, 0x74, 0x64, 0x61, 0x74, 0x61, 0x2f, 0x66, 0x69, 0x65,
+	0x6c, 0x64, 0x6e, 0x61, 0x6d, 0x65, 0x73,
 }
 
-var xxx_messageInfo_Message_OneofMessageConflict proto.InternalMessageInfo
+var (
+	file_fieldnames_fieldnames_proto_rawDescOnce sync.Once
+	file_fieldnames_fieldnames_proto_rawDescData = file_fieldnames_fieldnames_proto_rawDesc
+)
 
-func init() {
-	proto.RegisterFile("fieldnames/fieldnames.proto", fileDescriptor_6bbe3f70febb9403)
-	proto.RegisterType((*Message)(nil), "goproto.protoc.fieldnames.Message")
-	proto.RegisterType((*Message_OneofMessageConflict)(nil), "goproto.protoc.fieldnames.Message.OneofMessageConflict")
+func file_fieldnames_fieldnames_proto_rawDescGZIP() []byte {
+	file_fieldnames_fieldnames_proto_rawDescOnce.Do(func() {
+		file_fieldnames_fieldnames_proto_rawDescData = protoimpl.X.CompressGZIP(file_fieldnames_fieldnames_proto_rawDescData)
+	})
+	return file_fieldnames_fieldnames_proto_rawDescData
 }
 
-var fileDescriptor_6bbe3f70febb9403 = []byte{
-	// 417 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x93, 0x4b, 0x6f, 0xd3, 0x40,
-	0x10, 0xc7, 0x49, 0x29, 0x6a, 0x32, 0x69, 0x79, 0xac, 0x42, 0xd8, 0x3e, 0x08, 0x08, 0x2e, 0x39,
-	0xd0, 0x58, 0x2a, 0x12, 0x27, 0x2e, 0x24, 0xa2, 0xe2, 0x42, 0x23, 0x45, 0x3d, 0x71, 0x59, 0x6d,
-	0x36, 0xe3, 0x8d, 0x25, 0x7b, 0xa7, 0xb2, 0xd7, 0xf0, 0xd5, 0xf8, 0x78, 0xc8, 0xb3, 0x7e, 0x54,
-	0xc1, 0xb7, 0x99, 0xdf, 0xff, 0x11, 0x8d, 0x57, 0x81, 0xcb, 0x38, 0xc1, 0x74, 0xe7, 0x74, 0x86,
-	0x45, 0xd4, 0x8d, 0x8b, 0x87, 0x9c, 0x3c, 0x89, 0x73, 0x4b, 0x3c, 0x84, 0xd5, 0x2c, 0x3a, 0xc3,
-	0x87, 0xbf, 0xcf, 0xe0, 0xe4, 0x27, 0x16, 0x85, 0xb6, 0x28, 0x2e, 0x61, 0xc4, 0x8a, 0x22, 0x87,
-	0x72, 0xf0, 0x7e, 0x30, 0x1f, 0x6d, 0x86, 0x0c, 0xd6, 0x0e, 0xc5, 0x05, 0x0c, 0x6f, 0xab, 0xf9,
-	0xfe, 0x0f, 0xc9, 0xa3, 0xa0, 0x35, 0xbb, 0x98, 0x01, 0xb0, 0xef, 0x7e, 0x9f, 0x23, 0xca, 0xa7,
-	0xac, 0x3e, 0x22, 0x62, 0x06, 0xe3, 0x50, 0xac, 0x62, 0x2a, 0x73, 0x79, 0xcc, 0x86, 0xf0, 0x5b,
-	0xb7, 0x54, 0xe6, 0x55, 0x7e, 0x87, 0x85, 0xc9, 0x93, 0x07, 0x4f, 0xb9, 0x84, 0x90, 0xef, 0x88,
-	0x90, 0x70, 0x92, 0xe9, 0xbc, 0xd8, 0xeb, 0x54, 0x8e, 0x59, 0x6c, 0x56, 0x71, 0x05, 0xa3, 0xd2,
-	0x35, 0xda, 0x69, 0xe8, 0x6d, 0x81, 0xf8, 0x08, 0x67, 0x7c, 0xb1, 0xca, 0xc2, 0x85, 0xf2, 0x8c,
-	0x1d, 0xa7, 0x0c, 0x9b, 0xab, 0xaf, 0x60, 0xb4, 0xd2, 0x19, 0xa6, 0x2b, 0x5d, 0xa0, 0x9c, 0x84,
-	0x8a, 0x16, 0x88, 0xb7, 0x00, 0xed, 0xa2, 0xe4, 0xeb, 0x1e, 0xd9, 0x54, 0x8b, 0x32, 0x55, 0x7a,
-	0x1a, 0x64, 0xd3, 0xca, 0x33, 0x18, 0x77, 0x69, 0x25, 0xdf, 0x1c, 0xc6, 0xcf, 0x61, 0x68, 0xd1,
-	0xab, 0xea, 0x29, 0xe4, 0x2c, 0x5c, 0x66, 0xd1, 0xdf, 0xe9, 0x0c, 0x85, 0x80, 0x63, 0xc6, 0xef,
-	0x18, 0xf3, 0x2c, 0xe6, 0xf0, 0x7c, 0xed, 0x90, 0xe2, 0x15, 0xb9, 0x38, 0x4d, 0x8c, 0xff, 0x26,
-	0xe7, 0x95, 0xfa, 0xe3, 0xc9, 0xe6, 0x80, 0x8b, 0x4f, 0xf0, 0x8a, 0x2a, 0xa2, 0x1c, 0x29, 0x53,
-	0x53, 0x79, 0xc3, 0xe6, 0xc1, 0xe6, 0x05, 0x4b, 0x77, 0xd4, 0xd8, 0xff, 0xeb, 0x5d, 0xca, 0xcf,
-	0xb5, 0xf5, 0x80, 0x8b, 0x2f, 0x30, 0x0d, 0xbd, 0xf5, 0x17, 0xed, 0xca, 0xbf, 0x72, 0xe2, 0x68,
-	0x33, 0x61, 0xbd, 0xfe, 0xb8, 0x4d, 0xf0, 0x62, 0x0a, 0x93, 0x75, 0x0f, 0x5f, 0x0a, 0x78, 0x19,
-	0xfa, 0x9a, 0x1e, 0xa5, 0x7b, 0xd8, 0xb6, 0x87, 0x99, 0xe5, 0xf7, 0x5f, 0x2b, 0x9b, 0xf8, 0x7d,
-	0xb9, 0x5d, 0x18, 0xca, 0x22, 0x4b, 0xa9, 0x76, 0x36, 0xe2, 0xa7, 0xdd, 0x96, 0x71, 0xf4, 0xfb,
-	0x26, 0x32, 0xd9, 0x2e, 0xec, 0xe6, 0xda, 0xa2, 0xbb, 0xb6, 0x14, 0x79, 0x2c, 0xfc, 0x4e, 0x7b,
-	0xfd, 0xe8, 0x2f, 0xf2, 0x2f, 0x00, 0x00, 0xff, 0xff, 0xbd, 0xee, 0x38, 0xe6, 0x3a, 0x03, 0x00,
-	0x00,
+var file_fieldnames_fieldnames_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_fieldnames_fieldnames_proto_goTypes = []interface{}{
+	(*Message)(nil),                      // 0: goproto.protoc.fieldnames.Message
+	(*Message_OneofMessageConflict)(nil), // 1: goproto.protoc.fieldnames.Message.OneofMessageConflict
+}
+var file_fieldnames_fieldnames_proto_depIdxs = []int32{
+	0, // starting offset of method output_type sub-list
+	0, // starting offset of method input_type sub-list
+	0, // starting offset of extension type_name sub-list
+	0, // starting offset of extension extendee sub-list
+	0, // starting offset of field type_name sub-list
 }
 
-func init() {
-	xxx_Fieldnames_protoFile_FileDesc.Messages = xxx_Fieldnames_protoFile_MessageDescs[0:1]
-	xxx_Fieldnames_protoFile_MessageDescs[0].Messages = xxx_Fieldnames_protoFile_MessageDescs[1:2]
-	var err error
-	Fieldnames_protoFile, err = prototype.NewFile(&xxx_Fieldnames_protoFile_FileDesc)
-	if err != nil {
-		panic(err)
+func init() { file_fieldnames_fieldnames_proto_init() }
+func file_fieldnames_fieldnames_proto_init() {
+	if File_fieldnames_fieldnames_proto != nil {
+		return
 	}
-}
-
-const _ = protoimpl.EnforceVersion(protoimpl.Version - 0)
-
-var Fieldnames_protoFile protoreflect.FileDescriptor
-
-var xxx_Fieldnames_protoFile_FileDesc = prototype.File{
-	Syntax:  protoreflect.Proto2,
-	Path:    "fieldnames/fieldnames.proto",
-	Package: "goproto.protoc.fieldnames",
-}
-var xxx_Fieldnames_protoFile_MessageTypes = [2]protoimpl.MessageType{
-	{Type: prototype.GoMessage(
-		xxx_Fieldnames_protoFile_MessageDescs[0].Reference(),
-		func(protoreflect.MessageType) protoreflect.Message {
-			return xxx_Message{new(Message)}
+	out := protoimpl.TypeBuilder{
+		File: protoimpl.DescBuilder{
+			RawDescriptor: file_fieldnames_fieldnames_proto_rawDesc,
+			NumEnums:      0,
+			NumMessages:   2,
+			NumExtensions: 0,
+			NumServices:   0,
 		},
-	)},
-	{Type: prototype.GoMessage(
-		xxx_Fieldnames_protoFile_MessageDescs[1].Reference(),
-		func(protoreflect.MessageType) protoreflect.Message {
-			return xxx_Message_OneofMessageConflict{new(Message_OneofMessageConflict)}
-		},
-	)},
-}
-var xxx_Fieldnames_protoFile_MessageDescs = [2]prototype.Message{
-	{
-		Name: "Message",
-		Fields: []prototype.Field{
-			{
-				Name:        "field_one",
-				Number:      1,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "fieldOne",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "FieldTwo",
-				Number:      2,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "FieldTwo",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "fieldThree",
-				Number:      3,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "fieldThree",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "field__four",
-				Number:      4,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "fieldFour",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "descriptor",
-				Number:      10,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "descriptor",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "marshal",
-				Number:      11,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "marshal",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "unmarshal",
-				Number:      12,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "unmarshal",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "proto_message",
-				Number:      13,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "protoMessage",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "CamelCase",
-				Number:      20,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "CamelCase",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "CamelCase_",
-				Number:      21,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "CamelCase",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "camel_case",
-				Number:      22,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "camelCase",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "CamelCase__",
-				Number:      23,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "CamelCase",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "get_name",
-				Number:      30,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "getName",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "name",
-				Number:      31,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "name",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "OneofConflictA",
-				Number:      40,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "OneofConflictA",
-				OneofName:   "oneof_conflict_a",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "oneof_no_conflict",
-				Number:      50,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "oneofNoConflict",
-				OneofName:   "oneof_conflict_b",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "OneofConflictB",
-				Number:      51,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "OneofConflictB",
-				OneofName:   "oneof_conflict_b",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "oneof_message_conflict",
-				Number:      60,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "oneofMessageConflict",
-				OneofName:   "oneof_conflict_c",
-				IsPacked:    prototype.False,
-			},
-		},
-		Oneofs: []prototype.Oneof{
-			{Name: "oneof_conflict_a"},
-			{Name: "oneof_conflict_b"},
-			{Name: "oneof_conflict_c"},
-		},
-	},
-	{
-		Name: "OneofMessageConflict",
-	},
+		GoTypes:           file_fieldnames_fieldnames_proto_goTypes,
+		DependencyIndexes: file_fieldnames_fieldnames_proto_depIdxs,
+		MessageInfos:      file_fieldnames_fieldnames_proto_msgTypes,
+	}.Build()
+	File_fieldnames_fieldnames_proto = out.File
+	file_fieldnames_fieldnames_proto_rawDesc = nil
+	file_fieldnames_fieldnames_proto_goTypes = nil
+	file_fieldnames_fieldnames_proto_depIdxs = nil
 }

@@ -4,19 +4,19 @@
 package import_public
 
 import (
-	proto "github.com/golang/protobuf/proto"
-	sub "github.com/golang/protobuf/v2/cmd/protoc-gen-go/testdata/import_public/sub"
-	sub2 "github.com/golang/protobuf/v2/cmd/protoc-gen-go/testdata/import_public/sub2"
-	protoreflect "github.com/golang/protobuf/v2/reflect/protoreflect"
-	prototype "github.com/golang/protobuf/v2/reflect/prototype"
-	protoimpl "github.com/golang/protobuf/v2/runtime/protoimpl"
+	sub "google.golang.org/protobuf/cmd/protoc-gen-go/testdata/import_public/sub"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoiface "google.golang.org/protobuf/runtime/protoiface"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	sync "sync"
 )
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const (
+	// Verify that runtime/protoimpl is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 0)
+	// Verify that this generated code is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(0 - protoimpl.MinVersion)
+)
 
 // Symbols defined in public import of import_public/sub/a.proto
 
@@ -56,168 +56,136 @@ type M_Submessage_SubmessageOneofInt64 = sub.M_Submessage_SubmessageOneofInt64
 
 var E_ExtensionField = sub.E_ExtensionField
 
-// Symbols defined in public import of import_public/sub2/a.proto
-
-type Sub2Message = sub2.Sub2Message
-
 type Public struct {
-	M                    *sub.M   `protobuf:"bytes,1,opt,name=m" json:"m,omitempty"`
-	E                    *sub.E   `protobuf:"varint,2,opt,name=e,enum=goproto.protoc.import_public.sub.E" json:"e,omitempty"`
-	Local                *Local   `protobuf:"bytes,3,opt,name=local" json:"local,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	M                    *sub.M                  `protobuf:"bytes,1,opt,name=m" json:"m,omitempty"`
+	E                    *sub.E                  `protobuf:"varint,2,opt,name=e,enum=goproto.protoc.import_public.sub.E" json:"e,omitempty"`
+	Local                *Local                  `protobuf:"bytes,3,opt,name=local" json:"local,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     protoimpl.UnknownFields `json:"-"`
+	XXX_sizecache        protoimpl.SizeCache     `json:"-"`
 }
 
-type xxx_Public struct{ m *Public }
-
-func (m *Public) ProtoReflect() protoreflect.Message {
-	return xxx_Public{m}
-}
-func (m xxx_Public) Type() protoreflect.MessageType {
-	return xxx_A_protoFile_MessageTypes[0].Type
-}
-func (m xxx_Public) KnownFields() protoreflect.KnownFields {
-	return xxx_A_protoFile_MessageTypes[0].KnownFieldsOf(m.m)
-}
-func (m xxx_Public) UnknownFields() protoreflect.UnknownFields {
-	return xxx_A_protoFile_MessageTypes[0].UnknownFieldsOf(m.m)
-}
-func (m xxx_Public) Interface() protoreflect.ProtoMessage {
-	return m.m
+func (x *Public) Reset() {
+	*x = Public{}
 }
 
-func (m *Public) Reset()         { *m = Public{} }
-func (m *Public) String() string { return proto.CompactTextString(m) }
-func (*Public) ProtoMessage()    {}
+func (x *Public) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Public) ProtoMessage() {}
+
+func (x *Public) ProtoReflect() protoreflect.Message {
+	return file_import_public_a_proto_msgTypes[0].MessageOf(x)
+}
+
+func (m *Public) XXX_Methods() *protoiface.Methods {
+	return file_import_public_a_proto_msgTypes[0].Methods()
+}
+
+// Deprecated: Use Public.ProtoReflect.Type instead.
 func (*Public) Descriptor() ([]byte, []int) {
-	return fileDescriptor_73b7577c95fa6b70, []int{0}
+	return file_import_public_a_proto_rawDescGZIP(), []int{0}
 }
 
-func (m *Public) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Public.Unmarshal(m, b)
-}
-func (m *Public) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Public.Marshal(b, m, deterministic)
-}
-func (m *Public) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Public.Merge(m, src)
-}
-func (m *Public) XXX_Size() int {
-	return xxx_messageInfo_Public.Size(m)
-}
-func (m *Public) XXX_DiscardUnknown() {
-	xxx_messageInfo_Public.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Public proto.InternalMessageInfo
-
-func (m *Public) GetM() *sub.M {
-	if m != nil {
-		return m.M
+func (x *Public) GetM() *sub.M {
+	if x != nil {
+		return x.M
 	}
 	return nil
 }
 
-func (m *Public) GetE() sub.E {
-	if m != nil && m.E != nil {
-		return *m.E
+func (x *Public) GetE() sub.E {
+	if x != nil && x.E != nil {
+		return *x.E
 	}
 	return sub.E_ZERO
 }
 
-func (m *Public) GetLocal() *Local {
-	if m != nil {
-		return m.Local
+func (x *Public) GetLocal() *Local {
+	if x != nil {
+		return x.Local
 	}
 	return nil
 }
 
-func init() {
-	proto.RegisterFile("import_public/a.proto", fileDescriptor_73b7577c95fa6b70)
-	proto.RegisterType((*Public)(nil), "goproto.protoc.import_public.Public")
+var File_import_public_a_proto protoreflect.FileDescriptor
+
+var file_import_public_a_proto_rawDesc = []byte{
+	0x0a, 0x15, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x2f,
+	0x61, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x1c, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2e, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x70,
+	0x75, 0x62, 0x6c, 0x69, 0x63, 0x1a, 0x19, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x70, 0x75,
+	0x62, 0x6c, 0x69, 0x63, 0x2f, 0x73, 0x75, 0x62, 0x2f, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x1a, 0x15, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x2f,
+	0x62, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xa9, 0x01, 0x0a, 0x06, 0x50, 0x75, 0x62, 0x6c,
+	0x69, 0x63, 0x12, 0x31, 0x0a, 0x01, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e,
+	0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2e, 0x69,
+	0x6d, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x2e, 0x73, 0x75, 0x62,
+	0x2e, 0x4d, 0x52, 0x01, 0x6d, 0x12, 0x31, 0x0a, 0x01, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e,
+	0x32, 0x23, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x63, 0x2e, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x2e,
+	0x73, 0x75, 0x62, 0x2e, 0x45, 0x52, 0x01, 0x65, 0x12, 0x39, 0x0a, 0x05, 0x6c, 0x6f, 0x63, 0x61,
+	0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2e, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x5f,
+	0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x2e, 0x4c, 0x6f, 0x63, 0x61, 0x6c, 0x52, 0x05, 0x6c, 0x6f,
+	0x63, 0x61, 0x6c, 0x42, 0x45, 0x5a, 0x43, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x67, 0x6f,
+	0x6c, 0x61, 0x6e, 0x67, 0x2e, 0x6f, 0x72, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2f, 0x63, 0x6d, 0x64, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2d, 0x67, 0x65, 0x6e,
+	0x2d, 0x67, 0x6f, 0x2f, 0x74, 0x65, 0x73, 0x74, 0x64, 0x61, 0x74, 0x61, 0x2f, 0x69, 0x6d, 0x70,
+	0x6f, 0x72, 0x74, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x50, 0x00, 0x50, 0x01,
 }
 
-var fileDescriptor_73b7577c95fa6b70 = []byte{
-	// 210 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0xcd, 0xcc, 0x2d, 0xc8,
-	0x2f, 0x2a, 0x89, 0x2f, 0x28, 0x4d, 0xca, 0xc9, 0x4c, 0xd6, 0x4f, 0xd4, 0x2b, 0x28, 0xca, 0x2f,
-	0xc9, 0x17, 0x92, 0x49, 0xcf, 0x07, 0x33, 0x20, 0xdc, 0x64, 0x3d, 0x14, 0x55, 0x52, 0x92, 0xa8,
-	0x9a, 0x8a, 0x4b, 0x93, 0x60, 0x1a, 0xa5, 0xa4, 0x30, 0xa4, 0x8c, 0xe0, 0x72, 0x68, 0x76, 0x25,
-	0x41, 0x84, 0x95, 0x56, 0x32, 0x72, 0xb1, 0x05, 0x80, 0x85, 0x84, 0x0c, 0xb9, 0x18, 0x73, 0x25,
-	0x18, 0x15, 0x18, 0x35, 0xb8, 0x8d, 0x94, 0xf5, 0xf0, 0x39, 0x41, 0xaf, 0xb8, 0x34, 0x49, 0xcf,
-	0x37, 0x88, 0x31, 0x17, 0xa4, 0x25, 0x55, 0x82, 0x49, 0x81, 0x51, 0x83, 0x8f, 0x18, 0x2d, 0xae,
-	0x41, 0x8c, 0xa9, 0x42, 0x96, 0x5c, 0xac, 0x39, 0xf9, 0xc9, 0x89, 0x39, 0x12, 0xcc, 0xc4, 0xd8,
-	0xe4, 0x03, 0x52, 0x1a, 0x04, 0xd1, 0xe1, 0xe4, 0x11, 0xe5, 0x96, 0x9e, 0x59, 0x92, 0x51, 0x9a,
-	0xa4, 0x97, 0x9c, 0x9f, 0xab, 0x9f, 0x9e, 0x9f, 0x93, 0x98, 0x97, 0xae, 0x0f, 0xd6, 0x96, 0x54,
-	0x9a, 0xa6, 0x5f, 0x66, 0xa4, 0x9f, 0x9c, 0x9b, 0x02, 0xe1, 0x27, 0xeb, 0xa6, 0xa7, 0xe6, 0xe9,
-	0xa6, 0xe7, 0xeb, 0x97, 0xa4, 0x16, 0x97, 0xa4, 0x24, 0x96, 0x24, 0xea, 0xa3, 0x18, 0x1b, 0xc0,
-	0x10, 0xc0, 0x18, 0xc0, 0x04, 0x08, 0x00, 0x00, 0xff, 0xff, 0xb3, 0x41, 0x0a, 0x11, 0x7f, 0x01,
-	0x00, 0x00,
+var (
+	file_import_public_a_proto_rawDescOnce sync.Once
+	file_import_public_a_proto_rawDescData = file_import_public_a_proto_rawDesc
+)
+
+func file_import_public_a_proto_rawDescGZIP() []byte {
+	file_import_public_a_proto_rawDescOnce.Do(func() {
+		file_import_public_a_proto_rawDescData = protoimpl.X.CompressGZIP(file_import_public_a_proto_rawDescData)
+	})
+	return file_import_public_a_proto_rawDescData
 }
 
-func init() {
-	xxx_A_protoFile_FileDesc.Messages = xxx_A_protoFile_MessageDescs[0:1]
-	xxx_A_protoFile_MessageDescs[0].Fields[0].MessageType = protoimpl.X.MessageTypeOf((*sub.M)(nil))
-	xxx_A_protoFile_MessageDescs[0].Fields[1].EnumType = protoimpl.X.EnumTypeOf(sub.E(0))
-	xxx_A_protoFile_MessageDescs[0].Fields[2].MessageType = protoimpl.X.MessageTypeOf((*Local)(nil))
-	var err error
-	A_protoFile, err = prototype.NewFile(&xxx_A_protoFile_FileDesc)
-	if err != nil {
-		panic(err)
+var file_import_public_a_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_import_public_a_proto_goTypes = []interface{}{
+	(*Public)(nil), // 0: goproto.protoc.import_public.Public
+	(*sub.M)(nil),  // 1: goproto.protoc.import_public.sub.M
+	(sub.E)(0),     // 2: goproto.protoc.import_public.sub.E
+	(*Local)(nil),  // 3: goproto.protoc.import_public.Local
+}
+var file_import_public_a_proto_depIdxs = []int32{
+	1, // goproto.protoc.import_public.Public.m:type_name -> goproto.protoc.import_public.sub.M
+	2, // goproto.protoc.import_public.Public.e:type_name -> goproto.protoc.import_public.sub.E
+	3, // goproto.protoc.import_public.Public.local:type_name -> goproto.protoc.import_public.Local
+	3, // starting offset of method output_type sub-list
+	3, // starting offset of method input_type sub-list
+	3, // starting offset of extension type_name sub-list
+	3, // starting offset of extension extendee sub-list
+	0, // starting offset of field type_name sub-list
+}
+
+func init() { file_import_public_a_proto_init() }
+func file_import_public_a_proto_init() {
+	if File_import_public_a_proto != nil {
+		return
 	}
-}
-
-const _ = protoimpl.EnforceVersion(protoimpl.Version - 0)
-
-var A_protoFile protoreflect.FileDescriptor
-
-var xxx_A_protoFile_FileDesc = prototype.File{
-	Syntax:  protoreflect.Proto2,
-	Path:    "import_public/a.proto",
-	Package: "goproto.protoc.import_public",
-	Imports: []protoreflect.FileImport{
-		{FileDescriptor: prototype.PlaceholderFile("import_public/sub/a.proto", "goproto.protoc.import_public.sub"), IsPublic: true},
-		{FileDescriptor: prototype.PlaceholderFile("import_public/sub2/a.proto", "goproto.protoc.import_public.sub2"), IsPublic: true},
-		{FileDescriptor: prototype.PlaceholderFile("import_public/b.proto", "goproto.protoc.import_public"), IsPublic: true},
-	},
-}
-var xxx_A_protoFile_MessageTypes = [1]protoimpl.MessageType{
-	{Type: prototype.GoMessage(
-		xxx_A_protoFile_MessageDescs[0].Reference(),
-		func(protoreflect.MessageType) protoreflect.Message {
-			return xxx_Public{new(Public)}
+	file_import_public_b_proto_init()
+	out := protoimpl.TypeBuilder{
+		File: protoimpl.DescBuilder{
+			RawDescriptor: file_import_public_a_proto_rawDesc,
+			NumEnums:      0,
+			NumMessages:   1,
+			NumExtensions: 0,
+			NumServices:   0,
 		},
-	)},
-}
-var xxx_A_protoFile_MessageDescs = [1]prototype.Message{
-	{
-		Name: "Public",
-		Fields: []prototype.Field{
-			{
-				Name:        "m",
-				Number:      1,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.MessageKind,
-				JSONName:    "m",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "e",
-				Number:      2,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.EnumKind,
-				JSONName:    "e",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "local",
-				Number:      3,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.MessageKind,
-				JSONName:    "local",
-				IsPacked:    prototype.False,
-			},
-		},
-	},
+		GoTypes:           file_import_public_a_proto_goTypes,
+		DependencyIndexes: file_import_public_a_proto_depIdxs,
+		MessageInfos:      file_import_public_a_proto_msgTypes,
+	}.Build()
+	File_import_public_a_proto = out.File
+	file_import_public_a_proto_rawDesc = nil
+	file_import_public_a_proto_goTypes = nil
+	file_import_public_a_proto_depIdxs = nil
 }

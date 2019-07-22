@@ -4,17 +4,18 @@
 package proto3
 
 import (
-	proto "github.com/golang/protobuf/proto"
-	protoreflect "github.com/golang/protobuf/v2/reflect/protoreflect"
-	prototype "github.com/golang/protobuf/v2/reflect/prototype"
-	protoimpl "github.com/golang/protobuf/v2/runtime/protoimpl"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	prototype "google.golang.org/protobuf/reflect/prototype"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	sync "sync"
 )
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const (
+	// Verify that runtime/protoimpl is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 0)
+	// Verify that this generated code is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(0 - protoimpl.MinVersion)
+)
 
 type Enum int32
 
@@ -23,13 +24,6 @@ const (
 	Enum_ONE  Enum = 1
 	Enum_TWO  Enum = 2
 )
-
-func (e Enum) Type() protoreflect.EnumType {
-	return xxx_Enum_protoFile_EnumTypes[0]
-}
-func (e Enum) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(e)
-}
 
 var Enum_name = map[int32]string{
 	0: "ZERO",
@@ -43,65 +37,87 @@ var Enum_value = map[string]int32{
 	"TWO":  2,
 }
 
+func (x Enum) Enum() *Enum {
+	p := new(Enum)
+	*p = x
+	return p
+}
+
 func (x Enum) String() string {
-	return proto.EnumName(Enum_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (Enum) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto3_enum_proto_enumTypes[0].EnumDescriptor
+}
+
+func (x Enum) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Enum.Type instead.
 func (Enum) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_b4b9b1e8d161a9a6, []int{0}
+	return file_proto3_enum_proto_rawDescGZIP(), []int{0}
 }
 
-func init() {
-	proto.RegisterFile("proto3/enum.proto", fileDescriptor_b4b9b1e8d161a9a6)
-	proto.RegisterEnum("goproto.protoc.proto3.Enum", Enum_name, Enum_value)
+var File_proto3_enum_proto protoreflect.FileDescriptor
+
+var file_proto3_enum_proto_rawDesc = []byte{
+	0x0a, 0x11, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33, 0x2f, 0x65, 0x6e, 0x75, 0x6d, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x12, 0x15, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33, 0x2a, 0x22, 0x0a, 0x04, 0x45, 0x6e,
+	0x75, 0x6d, 0x12, 0x08, 0x0a, 0x04, 0x5a, 0x45, 0x52, 0x4f, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03,
+	0x4f, 0x4e, 0x45, 0x10, 0x01, 0x12, 0x07, 0x0a, 0x03, 0x54, 0x57, 0x4f, 0x10, 0x02, 0x42, 0x3e,
+	0x5a, 0x3c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x67, 0x6f, 0x6c, 0x61, 0x6e, 0x67, 0x2e,
+	0x6f, 0x72, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x63, 0x6d, 0x64,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2d, 0x67, 0x65, 0x6e, 0x2d, 0x67, 0x6f, 0x2f, 0x74,
+	0x65, 0x73, 0x74, 0x64, 0x61, 0x74, 0x61, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var fileDescriptor_b4b9b1e8d161a9a6 = []byte{
-	// 144 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2c, 0x28, 0xca, 0x2f,
-	0xc9, 0x37, 0xd6, 0x4f, 0xcd, 0x2b, 0xcd, 0xd5, 0x03, 0xb3, 0x85, 0x44, 0xd3, 0xf3, 0xc1, 0x0c,
-	0x08, 0x37, 0x19, 0x42, 0x19, 0x6b, 0x29, 0x71, 0xb1, 0xb8, 0xe6, 0x95, 0xe6, 0x0a, 0x71, 0x70,
-	0xb1, 0x44, 0xb9, 0x06, 0xf9, 0x0b, 0x30, 0x08, 0xb1, 0x73, 0x31, 0xfb, 0xfb, 0xb9, 0x0a, 0x30,
-	0x82, 0x18, 0x21, 0xe1, 0xfe, 0x02, 0x4c, 0x4e, 0x8e, 0x51, 0xf6, 0xe9, 0x99, 0x25, 0x19, 0xa5,
-	0x49, 0x7a, 0xc9, 0xf9, 0xb9, 0xfa, 0xe9, 0xf9, 0x39, 0x89, 0x79, 0xe9, 0xfa, 0x60, 0xfd, 0x49,
-	0xa5, 0x69, 0xfa, 0x65, 0x46, 0xfa, 0xc9, 0xb9, 0x29, 0x10, 0x7e, 0xb2, 0x6e, 0x7a, 0x6a, 0x9e,
-	0x6e, 0x7a, 0xbe, 0x7e, 0x49, 0x6a, 0x71, 0x49, 0x4a, 0x62, 0x49, 0x22, 0x44, 0xd8, 0x38, 0x89,
-	0x0d, 0x42, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x96, 0x4a, 0x7d, 0xc7, 0x99, 0x00, 0x00, 0x00,
+var (
+	file_proto3_enum_proto_rawDescOnce sync.Once
+	file_proto3_enum_proto_rawDescData = file_proto3_enum_proto_rawDesc
+)
+
+func file_proto3_enum_proto_rawDescGZIP() []byte {
+	file_proto3_enum_proto_rawDescOnce.Do(func() {
+		file_proto3_enum_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto3_enum_proto_rawDescData)
+	})
+	return file_proto3_enum_proto_rawDescData
 }
 
-func init() {
-	xxx_Enum_protoFile_FileDesc.Enums = xxx_Enum_protoFile_EnumDescs[0:1]
-	var err error
-	Enum_protoFile, err = prototype.NewFile(&xxx_Enum_protoFile_FileDesc)
-	if err != nil {
-		panic(err)
+var file_proto3_enum_proto_enumTypes = make([]prototype.Enum, 1)
+var file_proto3_enum_proto_goTypes = []interface{}{
+	(Enum)(0), // 0: goproto.protoc.proto3.Enum
+}
+var file_proto3_enum_proto_depIdxs = []int32{
+	0, // starting offset of method output_type sub-list
+	0, // starting offset of method input_type sub-list
+	0, // starting offset of extension type_name sub-list
+	0, // starting offset of extension extendee sub-list
+	0, // starting offset of field type_name sub-list
+}
+
+func init() { file_proto3_enum_proto_init() }
+func file_proto3_enum_proto_init() {
+	if File_proto3_enum_proto != nil {
+		return
 	}
-}
-
-const _ = protoimpl.EnforceVersion(protoimpl.Version - 0)
-
-var Enum_protoFile protoreflect.FileDescriptor
-
-var xxx_Enum_protoFile_FileDesc = prototype.File{
-	Syntax:  protoreflect.Proto3,
-	Path:    "proto3/enum.proto",
-	Package: "goproto.protoc.proto3",
-}
-var xxx_Enum_protoFile_EnumTypes = [1]protoreflect.EnumType{
-	prototype.GoEnum(
-		xxx_Enum_protoFile_EnumDescs[0].Reference(),
-		func(_ protoreflect.EnumType, n protoreflect.EnumNumber) protoreflect.Enum {
-			return Enum(n)
+	out := protoimpl.TypeBuilder{
+		File: protoimpl.DescBuilder{
+			RawDescriptor: file_proto3_enum_proto_rawDesc,
+			NumEnums:      1,
+			NumMessages:   0,
+			NumExtensions: 0,
+			NumServices:   0,
 		},
-	),
-}
-var xxx_Enum_protoFile_EnumDescs = [1]prototype.Enum{
-	{
-		Name: "Enum",
-		Values: []prototype.EnumValue{
-			{Name: "ZERO", Number: 0},
-			{Name: "ONE", Number: 1},
-			{Name: "TWO", Number: 2},
-		},
-	},
+		GoTypes:           file_proto3_enum_proto_goTypes,
+		DependencyIndexes: file_proto3_enum_proto_depIdxs,
+	}.Build()
+	File_proto3_enum_proto = out.File
+	file_proto3_enum_proto_enumTypes = out.Enums
+	file_proto3_enum_proto_rawDesc = nil
+	file_proto3_enum_proto_goTypes = nil
+	file_proto3_enum_proto_depIdxs = nil
 }

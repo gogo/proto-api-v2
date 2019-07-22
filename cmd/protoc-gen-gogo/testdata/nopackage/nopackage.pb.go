@@ -4,30 +4,25 @@
 package nopackage
 
 import (
-	proto "github.com/golang/protobuf/proto"
-	protoreflect "github.com/golang/protobuf/v2/reflect/protoreflect"
-	prototype "github.com/golang/protobuf/v2/reflect/prototype"
-	protoimpl "github.com/golang/protobuf/v2/runtime/protoimpl"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	prototype "google.golang.org/protobuf/reflect/prototype"
+	protoiface "google.golang.org/protobuf/runtime/protoiface"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	sync "sync"
 )
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const (
+	// Verify that runtime/protoimpl is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 0)
+	// Verify that this generated code is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(0 - protoimpl.MinVersion)
+)
 
 type Enum int32
 
 const (
 	Enum_ZERO Enum = 0
 )
-
-func (e Enum) Type() protoreflect.EnumType {
-	return xxx_Nopackage_protoFile_EnumTypes[0]
-}
-func (e Enum) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(e)
-}
 
 var Enum_name = map[int32]string{
 	0: "ZERO",
@@ -44,173 +39,140 @@ func (x Enum) Enum() *Enum {
 }
 
 func (x Enum) String() string {
-	return proto.EnumName(Enum_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (x *Enum) UnmarshalJSON(data []byte) error {
-	value, err := proto.UnmarshalJSONEnum(Enum_value, data, "Enum")
+func (Enum) Descriptor() protoreflect.EnumDescriptor {
+	return file_nopackage_nopackage_proto_enumTypes[0].EnumDescriptor
+}
+
+func (x Enum) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *Enum) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = Enum(value)
+	*x = Enum(num)
 	return nil
 }
 
+// Deprecated: Use Enum.Type instead.
 func (Enum) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_f33a1d5d178c43c9, []int{0}
+	return file_nopackage_nopackage_proto_rawDescGZIP(), []int{0}
 }
 
 type Message struct {
-	StringField          *string  `protobuf:"bytes,1,opt,name=string_field,json=stringField" json:"string_field,omitempty"`
-	EnumField            *Enum    `protobuf:"varint,2,opt,name=enum_field,json=enumField,enum=Enum,def=0" json:"enum_field,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	StringField          *string                 `protobuf:"bytes,1,opt,name=string_field,json=stringField" json:"string_field,omitempty"`
+	EnumField            *Enum                   `protobuf:"varint,2,opt,name=enum_field,json=enumField,enum=Enum,def=0" json:"enum_field,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     protoimpl.UnknownFields `json:"-"`
+	XXX_sizecache        protoimpl.SizeCache     `json:"-"`
 }
 
-type xxx_Message struct{ m *Message }
-
-func (m *Message) ProtoReflect() protoreflect.Message {
-	return xxx_Message{m}
-}
-func (m xxx_Message) Type() protoreflect.MessageType {
-	return xxx_Nopackage_protoFile_MessageTypes[0].Type
-}
-func (m xxx_Message) KnownFields() protoreflect.KnownFields {
-	return xxx_Nopackage_protoFile_MessageTypes[0].KnownFieldsOf(m.m)
-}
-func (m xxx_Message) UnknownFields() protoreflect.UnknownFields {
-	return xxx_Nopackage_protoFile_MessageTypes[0].UnknownFieldsOf(m.m)
-}
-func (m xxx_Message) Interface() protoreflect.ProtoMessage {
-	return m.m
+func (x *Message) Reset() {
+	*x = Message{}
 }
 
-func (m *Message) Reset()         { *m = Message{} }
-func (m *Message) String() string { return proto.CompactTextString(m) }
-func (*Message) ProtoMessage()    {}
+func (x *Message) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Message) ProtoMessage() {}
+
+func (x *Message) ProtoReflect() protoreflect.Message {
+	return file_nopackage_nopackage_proto_msgTypes[0].MessageOf(x)
+}
+
+func (m *Message) XXX_Methods() *protoiface.Methods {
+	return file_nopackage_nopackage_proto_msgTypes[0].Methods()
+}
+
+// Deprecated: Use Message.ProtoReflect.Type instead.
 func (*Message) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f33a1d5d178c43c9, []int{0}
+	return file_nopackage_nopackage_proto_rawDescGZIP(), []int{0}
 }
-
-func (m *Message) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Message.Unmarshal(m, b)
-}
-func (m *Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Message.Marshal(b, m, deterministic)
-}
-func (m *Message) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Message.Merge(m, src)
-}
-func (m *Message) XXX_Size() int {
-	return xxx_messageInfo_Message.Size(m)
-}
-func (m *Message) XXX_DiscardUnknown() {
-	xxx_messageInfo_Message.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Message proto.InternalMessageInfo
 
 const Default_Message_EnumField Enum = Enum_ZERO
 
-func (m *Message) GetStringField() string {
-	if m != nil && m.StringField != nil {
-		return *m.StringField
+func (x *Message) GetStringField() string {
+	if x != nil && x.StringField != nil {
+		return *x.StringField
 	}
 	return ""
 }
 
-func (m *Message) GetEnumField() Enum {
-	if m != nil && m.EnumField != nil {
-		return *m.EnumField
+func (x *Message) GetEnumField() Enum {
+	if x != nil && x.EnumField != nil {
+		return *x.EnumField
 	}
 	return Default_Message_EnumField
 }
 
-func init() {
-	proto.RegisterFile("nopackage/nopackage.proto", fileDescriptor_f33a1d5d178c43c9)
-	proto.RegisterEnum("Enum", Enum_name, Enum_value)
-	proto.RegisterType((*Message)(nil), "Message")
+var File_nopackage_nopackage_proto protoreflect.FileDescriptor
+
+var file_nopackage_nopackage_proto_rawDesc = []byte{
+	0x0a, 0x19, 0x6e, 0x6f, 0x70, 0x61, 0x63, 0x6b, 0x61, 0x67, 0x65, 0x2f, 0x6e, 0x6f, 0x70, 0x61,
+	0x63, 0x6b, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x58, 0x0a, 0x07, 0x4d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x21, 0x0a, 0x0c, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67,
+	0x5f, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x73, 0x74,
+	0x72, 0x69, 0x6e, 0x67, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x12, 0x2a, 0x0a, 0x0a, 0x65, 0x6e, 0x75,
+	0x6d, 0x5f, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x05, 0x2e,
+	0x45, 0x6e, 0x75, 0x6d, 0x3a, 0x04, 0x5a, 0x45, 0x52, 0x4f, 0x52, 0x09, 0x65, 0x6e, 0x75, 0x6d,
+	0x46, 0x69, 0x65, 0x6c, 0x64, 0x2a, 0x10, 0x0a, 0x04, 0x45, 0x6e, 0x75, 0x6d, 0x12, 0x08, 0x0a,
+	0x04, 0x5a, 0x45, 0x52, 0x4f, 0x10, 0x00,
 }
 
-var fileDescriptor_f33a1d5d178c43c9 = []byte{
-	// 130 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0xcc, 0xcb, 0x2f, 0x48,
-	0x4c, 0xce, 0x4e, 0x4c, 0x4f, 0xd5, 0x87, 0xb3, 0xf4, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2, 0x95, 0x22,
-	0xb8, 0xd8, 0x7d, 0x53, 0x8b, 0x8b, 0x13, 0xd3, 0x53, 0x85, 0x14, 0xb9, 0x78, 0x8a, 0x4b, 0x8a,
-	0x32, 0xf3, 0xd2, 0xe3, 0xd3, 0x32, 0x53, 0x73, 0x52, 0x24, 0x18, 0x15, 0x18, 0x35, 0x38, 0x83,
-	0xb8, 0x21, 0x62, 0x6e, 0x20, 0x21, 0x21, 0x2d, 0x2e, 0xae, 0xd4, 0xbc, 0xd2, 0x5c, 0xa8, 0x02,
-	0x26, 0x05, 0x46, 0x0d, 0x3e, 0x23, 0x56, 0x3d, 0xd7, 0xbc, 0xd2, 0x5c, 0x2b, 0x96, 0x28, 0xd7,
-	0x20, 0xff, 0x20, 0x4e, 0x90, 0x34, 0x58, 0xad, 0x96, 0x00, 0x17, 0x0b, 0x48, 0x42, 0x88, 0x83,
-	0x0b, 0x2c, 0x25, 0xc0, 0x00, 0x08, 0x00, 0x00, 0xff, 0xff, 0x31, 0x29, 0xe4, 0xb2, 0x87, 0x00,
-	0x00, 0x00,
+var (
+	file_nopackage_nopackage_proto_rawDescOnce sync.Once
+	file_nopackage_nopackage_proto_rawDescData = file_nopackage_nopackage_proto_rawDesc
+)
+
+func file_nopackage_nopackage_proto_rawDescGZIP() []byte {
+	file_nopackage_nopackage_proto_rawDescOnce.Do(func() {
+		file_nopackage_nopackage_proto_rawDescData = protoimpl.X.CompressGZIP(file_nopackage_nopackage_proto_rawDescData)
+	})
+	return file_nopackage_nopackage_proto_rawDescData
 }
 
-func init() {
-	xxx_Nopackage_protoFile_FileDesc.Enums = xxx_Nopackage_protoFile_EnumDescs[0:1]
-	xxx_Nopackage_protoFile_FileDesc.Messages = xxx_Nopackage_protoFile_MessageDescs[0:1]
-	xxx_Nopackage_protoFile_MessageDescs[0].Fields[1].EnumType = xxx_Nopackage_protoFile_EnumTypes[0]
-	var err error
-	Nopackage_protoFile, err = prototype.NewFile(&xxx_Nopackage_protoFile_FileDesc)
-	if err != nil {
-		panic(err)
+var file_nopackage_nopackage_proto_enumTypes = make([]prototype.Enum, 1)
+var file_nopackage_nopackage_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_nopackage_nopackage_proto_goTypes = []interface{}{
+	(Enum)(0),       // 0: Enum
+	(*Message)(nil), // 1: Message
+}
+var file_nopackage_nopackage_proto_depIdxs = []int32{
+	0, // Message.enum_field:type_name -> Enum
+	1, // starting offset of method output_type sub-list
+	1, // starting offset of method input_type sub-list
+	1, // starting offset of extension type_name sub-list
+	1, // starting offset of extension extendee sub-list
+	0, // starting offset of field type_name sub-list
+}
+
+func init() { file_nopackage_nopackage_proto_init() }
+func file_nopackage_nopackage_proto_init() {
+	if File_nopackage_nopackage_proto != nil {
+		return
 	}
-}
-
-const _ = protoimpl.EnforceVersion(protoimpl.Version - 0)
-
-var Nopackage_protoFile protoreflect.FileDescriptor
-
-var xxx_Nopackage_protoFile_FileDesc = prototype.File{
-	Syntax:  protoreflect.Proto2,
-	Path:    "nopackage/nopackage.proto",
-	Package: "",
-}
-var xxx_Nopackage_protoFile_EnumTypes = [1]protoreflect.EnumType{
-	prototype.GoEnum(
-		xxx_Nopackage_protoFile_EnumDescs[0].Reference(),
-		func(_ protoreflect.EnumType, n protoreflect.EnumNumber) protoreflect.Enum {
-			return Enum(n)
+	out := protoimpl.TypeBuilder{
+		File: protoimpl.DescBuilder{
+			RawDescriptor: file_nopackage_nopackage_proto_rawDesc,
+			NumEnums:      1,
+			NumMessages:   1,
+			NumExtensions: 0,
+			NumServices:   0,
 		},
-	),
-}
-var xxx_Nopackage_protoFile_EnumDescs = [1]prototype.Enum{
-	{
-		Name: "Enum",
-		Values: []prototype.EnumValue{
-			{Name: "ZERO", Number: 0},
-		},
-	},
-}
-var xxx_Nopackage_protoFile_MessageTypes = [1]protoimpl.MessageType{
-	{Type: prototype.GoMessage(
-		xxx_Nopackage_protoFile_MessageDescs[0].Reference(),
-		func(protoreflect.MessageType) protoreflect.Message {
-			return xxx_Message{new(Message)}
-		},
-	)},
-}
-var xxx_Nopackage_protoFile_MessageDescs = [1]prototype.Message{
-	{
-		Name: "Message",
-		Fields: []prototype.Field{
-			{
-				Name:        "string_field",
-				Number:      1,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.StringKind,
-				JSONName:    "stringField",
-				IsPacked:    prototype.False,
-			},
-			{
-				Name:        "enum_field",
-				Number:      2,
-				Cardinality: protoreflect.Optional,
-				Kind:        protoreflect.EnumKind,
-				JSONName:    "enumField",
-				Default:     protoreflect.ValueOf(string("ZERO")),
-				IsPacked:    prototype.False,
-			},
-		},
-	},
+		GoTypes:           file_nopackage_nopackage_proto_goTypes,
+		DependencyIndexes: file_nopackage_nopackage_proto_depIdxs,
+		MessageInfos:      file_nopackage_nopackage_proto_msgTypes,
+	}.Build()
+	File_nopackage_nopackage_proto = out.File
+	file_nopackage_nopackage_proto_enumTypes = out.Enums
+	file_nopackage_nopackage_proto_rawDesc = nil
+	file_nopackage_nopackage_proto_goTypes = nil
+	file_nopackage_nopackage_proto_depIdxs = nil
 }

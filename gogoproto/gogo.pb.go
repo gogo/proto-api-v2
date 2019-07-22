@@ -6,7 +6,7 @@ package gogoproto
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
-	descriptor "github.com/golang/protobuf/v2/types/descriptor"
+	descriptor "google.golang.org/protobuf/types/descriptorpb"
 	math "math"
 )
 

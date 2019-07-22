@@ -4,112 +4,104 @@
 package test_a_2
 
 import (
-	proto "github.com/golang/protobuf/proto"
-	protoreflect "github.com/golang/protobuf/v2/reflect/protoreflect"
-	prototype "github.com/golang/protobuf/v2/reflect/prototype"
-	protoimpl "github.com/golang/protobuf/v2/runtime/protoimpl"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoiface "google.golang.org/protobuf/runtime/protoiface"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	sync "sync"
 )
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const (
+	// Verify that runtime/protoimpl is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 0)
+	// Verify that this generated code is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(0 - protoimpl.MinVersion)
+)
 
 type M3 struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     protoimpl.UnknownFields `json:"-"`
+	XXX_sizecache        protoimpl.SizeCache     `json:"-"`
 }
 
-type xxx_M3 struct{ m *M3 }
-
-func (m *M3) ProtoReflect() protoreflect.Message {
-	return xxx_M3{m}
-}
-func (m xxx_M3) Type() protoreflect.MessageType {
-	return xxx_M3_protoFile_MessageTypes[0].Type
-}
-func (m xxx_M3) KnownFields() protoreflect.KnownFields {
-	return xxx_M3_protoFile_MessageTypes[0].KnownFieldsOf(m.m)
-}
-func (m xxx_M3) UnknownFields() protoreflect.UnknownFields {
-	return xxx_M3_protoFile_MessageTypes[0].UnknownFieldsOf(m.m)
-}
-func (m xxx_M3) Interface() protoreflect.ProtoMessage {
-	return m.m
+func (x *M3) Reset() {
+	*x = M3{}
 }
 
-func (m *M3) Reset()         { *m = M3{} }
-func (m *M3) String() string { return proto.CompactTextString(m) }
-func (*M3) ProtoMessage()    {}
+func (x *M3) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*M3) ProtoMessage() {}
+
+func (x *M3) ProtoReflect() protoreflect.Message {
+	return file_imports_test_a_2_m3_proto_msgTypes[0].MessageOf(x)
+}
+
+func (m *M3) XXX_Methods() *protoiface.Methods {
+	return file_imports_test_a_2_m3_proto_msgTypes[0].Methods()
+}
+
+// Deprecated: Use M3.ProtoReflect.Type instead.
 func (*M3) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ff9d8f834875c9c5, []int{0}
+	return file_imports_test_a_2_m3_proto_rawDescGZIP(), []int{0}
 }
 
-func (m *M3) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_M3.Unmarshal(m, b)
-}
-func (m *M3) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_M3.Marshal(b, m, deterministic)
-}
-func (m *M3) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_M3.Merge(m, src)
-}
-func (m *M3) XXX_Size() int {
-	return xxx_messageInfo_M3.Size(m)
-}
-func (m *M3) XXX_DiscardUnknown() {
-	xxx_messageInfo_M3.DiscardUnknown(m)
+var File_imports_test_a_2_m3_proto protoreflect.FileDescriptor
+
+var file_imports_test_a_2_m3_proto_rawDesc = []byte{
+	0x0a, 0x19, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x2f, 0x74, 0x65, 0x73, 0x74, 0x5f, 0x61,
+	0x5f, 0x32, 0x2f, 0x6d, 0x33, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x74, 0x65, 0x73,
+	0x74, 0x2e, 0x61, 0x22, 0x04, 0x0a, 0x02, 0x4d, 0x33, 0x42, 0x48, 0x5a, 0x46, 0x67, 0x6f, 0x6f,
+	0x67, 0x6c, 0x65, 0x2e, 0x67, 0x6f, 0x6c, 0x61, 0x6e, 0x67, 0x2e, 0x6f, 0x72, 0x67, 0x2f, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x63, 0x6d, 0x64, 0x2f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x63, 0x2d, 0x67, 0x65, 0x6e, 0x2d, 0x67, 0x6f, 0x2f, 0x74, 0x65, 0x73, 0x74, 0x64, 0x61,
+	0x74, 0x61, 0x2f, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x2f, 0x74, 0x65, 0x73, 0x74, 0x5f,
+	0x61, 0x5f, 0x32, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var xxx_messageInfo_M3 proto.InternalMessageInfo
+var (
+	file_imports_test_a_2_m3_proto_rawDescOnce sync.Once
+	file_imports_test_a_2_m3_proto_rawDescData = file_imports_test_a_2_m3_proto_rawDesc
+)
 
-func init() {
-	proto.RegisterFile("imports/test_a_2/m3.proto", fileDescriptor_ff9d8f834875c9c5)
-	proto.RegisterType((*M3)(nil), "test.a.M3")
+func file_imports_test_a_2_m3_proto_rawDescGZIP() []byte {
+	file_imports_test_a_2_m3_proto_rawDescOnce.Do(func() {
+		file_imports_test_a_2_m3_proto_rawDescData = protoimpl.X.CompressGZIP(file_imports_test_a_2_m3_proto_rawDescData)
+	})
+	return file_imports_test_a_2_m3_proto_rawDescData
 }
 
-var fileDescriptor_ff9d8f834875c9c5 = []byte{
-	// 114 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0xcc, 0xcc, 0x2d, 0xc8,
-	0x2f, 0x2a, 0x29, 0xd6, 0x2f, 0x49, 0x2d, 0x2e, 0x89, 0x4f, 0x8c, 0x37, 0xd2, 0xcf, 0x35, 0xd6,
-	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x03, 0x09, 0xe9, 0x25, 0x2a, 0xb1, 0x70, 0x31, 0xf9,
-	0x1a, 0x3b, 0xb9, 0x44, 0x39, 0xa5, 0x67, 0x96, 0x64, 0x94, 0x26, 0xe9, 0x25, 0xe7, 0xe7, 0xea,
-	0xa7, 0xe7, 0xe7, 0x24, 0xe6, 0xa5, 0xeb, 0x83, 0x15, 0x26, 0x95, 0xa6, 0x41, 0x18, 0xc9, 0xba,
-	0xe9, 0xa9, 0x79, 0xba, 0xe9, 0xf9, 0x60, 0xb3, 0x52, 0x12, 0x4b, 0x12, 0xf5, 0xd1, 0x0d, 0x4f,
-	0x62, 0x03, 0x2b, 0x34, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0x23, 0x86, 0x27, 0x47, 0x77, 0x00,
-	0x00, 0x00,
+var file_imports_test_a_2_m3_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_imports_test_a_2_m3_proto_goTypes = []interface{}{
+	(*M3)(nil), // 0: test.a.M3
+}
+var file_imports_test_a_2_m3_proto_depIdxs = []int32{
+	0, // starting offset of method output_type sub-list
+	0, // starting offset of method input_type sub-list
+	0, // starting offset of extension type_name sub-list
+	0, // starting offset of extension extendee sub-list
+	0, // starting offset of field type_name sub-list
 }
 
-func init() {
-	xxx_M3_protoFile_FileDesc.Messages = xxx_M3_protoFile_MessageDescs[0:1]
-	var err error
-	M3_protoFile, err = prototype.NewFile(&xxx_M3_protoFile_FileDesc)
-	if err != nil {
-		panic(err)
+func init() { file_imports_test_a_2_m3_proto_init() }
+func file_imports_test_a_2_m3_proto_init() {
+	if File_imports_test_a_2_m3_proto != nil {
+		return
 	}
-}
-
-const _ = protoimpl.EnforceVersion(protoimpl.Version - 0)
-
-var M3_protoFile protoreflect.FileDescriptor
-
-var xxx_M3_protoFile_FileDesc = prototype.File{
-	Syntax:  protoreflect.Proto3,
-	Path:    "imports/test_a_2/m3.proto",
-	Package: "test.a",
-}
-var xxx_M3_protoFile_MessageTypes = [1]protoimpl.MessageType{
-	{Type: prototype.GoMessage(
-		xxx_M3_protoFile_MessageDescs[0].Reference(),
-		func(protoreflect.MessageType) protoreflect.Message {
-			return xxx_M3{new(M3)}
+	out := protoimpl.TypeBuilder{
+		File: protoimpl.DescBuilder{
+			RawDescriptor: file_imports_test_a_2_m3_proto_rawDesc,
+			NumEnums:      0,
+			NumMessages:   1,
+			NumExtensions: 0,
+			NumServices:   0,
 		},
-	)},
-}
-var xxx_M3_protoFile_MessageDescs = [1]prototype.Message{
-	{
-		Name: "M3",
-	},
+		GoTypes:           file_imports_test_a_2_m3_proto_goTypes,
+		DependencyIndexes: file_imports_test_a_2_m3_proto_depIdxs,
+		MessageInfos:      file_imports_test_a_2_m3_proto_msgTypes,
+	}.Build()
+	File_imports_test_a_2_m3_proto = out.File
+	file_imports_test_a_2_m3_proto_rawDesc = nil
+	file_imports_test_a_2_m3_proto_goTypes = nil
+	file_imports_test_a_2_m3_proto_depIdxs = nil
 }

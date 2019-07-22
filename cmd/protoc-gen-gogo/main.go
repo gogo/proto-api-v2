@@ -10,8 +10,8 @@ import (
 	"errors"
 	"flag"
 
-	gengo "github.com/gogo/protobuf/cmd/protoc-gen-gogo/internal_gengo"
-	"github.com/golang/protobuf/v2/protogen"
+	gengo "google.golang.org/protobuf/cmd/protoc-gen-go/internal_gengo"
+	"google.golang.org/protobuf/compiler/protogen"
 )
 
 func main() {
@@ -25,18 +25,15 @@ func main() {
 	)
 	protogen.Run(opts, func(gen *protogen.Plugin) error {
 		if *plugins != "" {
-			return errors.New("protoc-gen-gogo: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC")
+			return errors.New("protoc-gen-go: plugins are not supported; use 'protoc --go-grpc_out=...' to generate gRPC")
 		}
 		if *importPrefix != "" {
-			return errors.New("protoc-gen-gogo: import_prefix is not supported")
+			return errors.New("protoc-gen-go: import_prefix is not supported")
 		}
 		for _, f := range gen.Files {
-			if !f.Generate {
-				continue
+			if f.Generate {
+				gengo.GenerateFile(gen, f)
 			}
-			filename := f.GeneratedFilenamePrefix + ".pb.go"
-			g := gen.NewGeneratedFile(filename, f.GoImportPath)
-			gengo.GenerateFile(gen, f, g)
 		}
 		return nil
 	})
